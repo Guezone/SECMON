@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block title %}Configuration{% endblock %} 
+{% block content %}
+<!-- SECMON by Aubin Custodio is licensed under CC BY-NC-SA 4.0 -->
+<div class="container-fluid">
+    <h1 class="h3 mb-0 text-gray-800">Configuration</h1><hr>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> SMTP Settings</h4>
+            <form method="post">
+                <div class="form-group" class="col-lg-4">
+                    <label>Email address</label>
+                    <input type="text" name="email" class="form-control" required="required">
+                </div> 
+                <div class="form-group" class="col-lg-4">
+                    <label>Password</label>
+                    <input type="password" name="pass1" class="form-control" required="required">
+                </div>   
+                <div class="form-group" class="col-lg-4">
+                    <label>Confirm password</label>
+                    <input type="password" name="pass2" class="form-control" required="required">
+                </div> 
+                <div class="form-group" class="col-lg-4">
+                    <label>SMTP server or IP address</label>
+                    <input type="text" name="server" class="form-control" required="required">
+                </div> 
+                <div class="form-group" class="col-lg-4">
+                    <label>SMTP port</label>
+                    <input type="text" name="port" class="form-control" required="required">
+                </div> 
+                <div class="form-group" class="col-lg-4">
+                    <label>Recipient's email addresses</label>
+                    <input type="text" name="recipients" class="form-control" required="required">
+                </div>    
+                <div class="form-group" class="col-lg-4">
+                    <label>SSL/TLS</label>
+                    <select class="form-control" name="tls">
+                        <option>True</option>
+                        <option>False</option>
+                    </select>
+                </div>         
+                <button type="submit" name="submit_smtp_config" class="d-none d-sm-inline-block btn btn-md btn-primary shadow-sm" style="background-color: #faaa3c;color: #262626;border-color: black;">Save changes</button>       
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

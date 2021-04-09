@@ -1,0 +1,148 @@
+{% extends "base.html" %} {% block title %}Product Management{% endblock %} 
+{% block content %}
+<!-- SECMON by Aubin Custodio is licensed under CC BY-NC-SA 4.0 -->
+</style>
+<div class="container-fluid">
+    <h1 class="h3 mb-0 text-gray-800">Product Management</h1><hr>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Search products</h4>
+            <form method="post" role="form" action="">
+
+                    <div class="form-group col-lg-3" style="padding-left:0px;">
+                        <input class="form-control" name="product" placeholder="ex : Windows 10 1809">          
+                    </div>
+                    <button type="submit" style="background-color: #faaa3c;color: #262626;" name="psearchbtn" value="search" class="btn btn-dark">Search</button>  
+            </form>     
+            {% if result %}
+            <br>
+            <div class="table-responsive" style="padding-left: 5px;">
+                <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0" id="dataTables-example" style="vertical-align: middle!important;">
+                    <thead style="vertical-align: middle!important;">
+                        <tr style="vertical-align: middle!important;">
+                            <th style="vertical-align: middle!important;text-align: center;">Type</th>
+                            <th style="vertical-align: middle!important;text-align: center;">Vendor</th>
+                            <th style="vertical-align: middle!important;text-align: center;">Product</th>
+                            <th style="vertical-align: middle!important;text-align: center;">Version</th>
+                            <th style="vertical-align: middle!important;text-align: center;">CPE</th>
+
+                        </tr>
+                    </thead>
+                    <tbody style="vertical-align: middle!important;">
+                        {% for product in result %}
+                            <tr style="vertical-align: middle!important;">
+                                <td style="vertical-align: middle!important;text-align: center;">{{ product[0] }}</td>
+                                <td style="vertical-align: middle!important;text-align: center;"> {{ product[1] }}</td>
+                                <td style="vertical-align: middle!important;text-align: center;"> {{ product[2] }}</td>
+                                <td style="vertical-align: middle!important;text-align: center;">{{ product[3] }}</td>
+                                <td style="vertical-align: middle!important;text-align: center;">{{ product[4] }}</td>
+                            </tr style="vertical-align: middle!important;">
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>       
+            {% endif %}  
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Manage product</h4>
+            <form role="form" method="post">
+               <div class="form-group" class="col-lg-4">
+                    <label>Action</label>
+                    <select class="form-control" name="product_action" class="col-lg-2">
+                        <option>Add</option>
+                        <option>Delete</option>
+                    </select>
+                </div>
+                <div class="form-group" class="col-lg-4">
+                    <label>Product configuration type</label>
+                    <select class="form-control" name="product_type">
+                        <option>Keyword</option>
+                        <option>CPE</option>
+                    </select>
+                </div>
+                <div class="form-group" class="col-lg-4">
+                    <label>Keyword</label>
+                    <input type="text" name="keyword" class="form-control" required="required">
+                </div>  
+                <button type="submit" style="background-color: #faaa3c;color: #262626;" name="submit_product_action" value="search" class="btn btn-dark">Save changes</button>                          
+            </form><hr>
+            <form role="form" method="post" enctype="multipart/form-data">
+               <div class="form-group" class="col-lg-4">
+                    <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> CSV Import</h4>
+
+                    <input type="file" name="file" class="btn btn-default" accept=".csv" style="padding-left: 0px;"><br>
+                    <button type="submit" style="background-color: #faaa3c;color: #262626;margin-top: 10px;" name="submit_import_csv_file"class="btn btn-dark">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Product list</h4>
+            <form role="form" method="post">
+                    <div class="form-group" class="col-lg-4">
+                        <label>Product configuration type</label>
+                        <select class="form-control" name="product_type">
+                            <option>All</option>
+                            <option>Products referenced by a CPE</option>
+                            <option>Products referenced by a keyword</option>
+                        </select>
+                    </div>
+                    <button type="submit" style="background-color: #faaa3c;color: #262626;" name="submit_product_display" value="search" class="btn btn-dark">Display</button>
+                    {% if plist %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable2" width="100%" cellspacing="0" id="dataTables-example" style="vertical-align: middle!important;">
+                                    <thead style="vertical-align: middle!important;">
+                                        <tr style="vertical-align: middle!important;">
+                                            <th style="vertical-align: middle!important;text-align: center;">Type</th>
+                                            <th style="vertical-align: middle!important;text-align: center;">Vendor</th>
+                                            <th style="vertical-align: middle!important;text-align: center;">Product</th>
+                                            <th style="vertical-align: middle!important;text-align: center;">Version</th>
+                                            <th style="vertical-align: middle!important;text-align: center;">CPE</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody style="vertical-align: middle!important;">
+                                        {% for product in plist %}
+                                            <tr style="vertical-align: middle!important;">
+                                                <td style="vertical-align: middle!important;text-align: center;">{{ product[0] }}</td>
+                                                <td style="vertical-align: middle!important;text-align: center;"> {{ product[1] }}</td>
+                                                <td style="vertical-align: middle!important;text-align: center;"> {{ product[2] }}</td>
+                                                <td style="vertical-align: middle!important;text-align: center;">{{ product[3] }}</td>
+                                                <td style="vertical-align: middle!important;text-align: center;">{{ product[4] }}</td>
+                                            </tr style="vertical-align: middle!important;">
+
+                                        {% endfor %}
+                                    </tbody>
+                        </table>
+                    </div>       
+                    {% endif %}  
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+    {{ super() }}
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $('#dataTable1').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+    });
+    </script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      $('#dataTable2').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+    });
+    </script>
+    <!-- Page level plugins -->
+    <script src="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{{ url_for('static', filename='js/demo/datatables-demo.js')}}"></script>
+{% endblock %}

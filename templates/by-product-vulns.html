@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% block title %} By product vulnerabilities{% endblock %} 
+{% block content %}
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+          <!-- Page Heading -->
+                <h1 class="h3 mb-0 text-gray-800">By product vulnerabilities</h1><hr>
+                <div class="row">
+
+                    <div class="col-lg-12" >
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                        <h4 class="card-title mb-5" style="margin-bottom: 1.5rem!important;font-size: 1.5rem;"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Display vulnerabilities by product</h4>
+                                        <form method="post" role="form">
+                                            <div class="form-group">
+                                                <select class="form-control col-lg-3" name="product_selection">
+                                                        {% for p in plist %}
+                                                            <option name="{% if p[1] == 'N/A' %}{{p[0]}}{%else%}{{p[1]}}{%endif%}" value="{% if p[1] == 'N/A' %}{{p[0]}}{%else%}{{p[1]}}{%endif%}">{{p[0]}}</option>
+                                                        {% endfor %}
+                                                </select>  
+                                            </div>
+                                            <div class="col-mb-4" style="height: 30px;">
+                                                <button type="submit" value="search" name="btn" class="d-none d-sm-inline-block btn btn-md btn-primary shadow-sm mybutton" style="background-color: #faaa3c;color: #262626;border-color: black;">Display</button></form> 
+                                            </div>
+                                </div> 
+                            </div>
+                    </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12" >
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <h4 class="card-title mb-5" style="margin-bottom: 1.5rem!important;font-size: 1.5rem;"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> High risk products</h4>
+                                    <div class="table-responsive">
+                                        <form method="post" role="form">
+                                            <div class="form-group">
+                                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" id="dataTables-example" style="vertical-align: middle!important;">
+                                                            <thead style="vertical-align: middle!important;">
+                                                                <tr style="vertical-align: middle!important;">
+                                                                    <th style="vertical-align: middle!important;text-align: center;">Product</th>
+                                                                    <th style="vertical-align: middle!important;text-align: center;">Linked CPE</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody style="vertical-align: middle!important;">
+                                                                {% for p in crit_cpe %}
+                                                                    <tr style="vertical-align: middle!important;">
+                                                                        <td><button target="_blank" class="btn btn-sm btn-warning btn-circle" value="{{p[0]}}" name="product_selection" style="color:#202020;margin-right: 10px;"><i class="fas fa-info-circle"></i></button>{{ p[1] }}</td>
+                                                                        <td style="vertical-align: middle!important;"> {{ p[0] }}</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                {% for p in crit_key %}
+                                                                    <tr style="vertical-align: middle!important;">
+                                                                        <td><button target="_blank" class="btn btn-sm btn-warning btn-circle" value="{{p[1]}}" name="product_selection" style="color:#202020;margin-right: 10px;"><i class="fas fa-info-circle"></i></button>{{ p[1] }}</td>
+                                                                        <td style="vertical-align: middle!important;"> {{ p[0] }}</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                    </table>
+                                            </div>
+                                        </form>
+                                    </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>     
+        </div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,295 @@
+{% extends "base.html" %} {% block title %} Product Card{% endblock %} 
+{% block content %}
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+          <!-- Page Heading -->
+          <h1 class="h3 mb-0 text-gray-800"><b>{{product}}</b> product card</h1><hr>
+<div class="row">
+    <div class="col-lg-12" >
+          <div class="card shadow mb-6">
+            <div class="card-body">
+                <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Product details</h4>
+                <b>SECMON product type : </b>{{pinfos[0]}}<br>
+                <b>CPE : </b>{{pinfos[1]}}<br>
+                <b>Type : </b>{{pinfos[2]}}<br>
+                <b>Product vendor : </b>{{pinfos[3]}}<br>
+                <b>Product name : </b>{{pinfos[4]}}<br>
+                <b>Version : </b>{{pinfos[5]}}<br>
+                <b>Number of vulnerabilities : </b>{{counters[0]}}<br><br>
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0" style="vertical-align: middle!important;">
+
+                        <thead style="vertical-align: middle!important;">
+                            <tr style="vertical-align: middle!important;">
+                                <th style="vertical-align: middle!important;text-align: center;">Exploitable</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Critical</th>
+                                <th style="vertical-align: middle!important;text-align: center;">High</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Medium</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Low</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Without CVSS score</th>
+                            </tr>
+                        </thead>
+                        <tbody style="vertical-align: middle!important;">
+                                <tr style="vertical-align: middle!important;">
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ counters[6] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ counters[1] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ counters[2] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ counters[3] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ counters[4] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ counters[5] }}</td>
+                                </tr style="vertical-align: middle!important;">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+           </div>
+    </div>
+</div><br>
+
+<div class="row">
+    <div class="col-lg-12" >
+          <div class="card shadow mb-6">
+            <div class="card-body">
+                                
+                <div class="table-responsive">
+                    <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Exploitable CVE - Details</h4> 
+                    <table class="table table-bordered" id="dataTable6" width="100%" cellspacing="0" style="vertical-align: middle!important;">
+
+                        <thead style="vertical-align: middle!important;">
+                            <tr style="vertical-align: middle!important;">
+                                <th style="vertical-align: middle!important;text-align: center;">CVE ID</th>
+                                <th style="vertical-align: middle!important;text-align: center;">CVSS Score</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody style="vertical-align: middle!important;">
+                            {% if not exploitable_cve %}<tr style="vertical-align: middle!important;"><td colspan="3" style="vertical-align: middle!important;text-align: center;"> None</td></tr style="vertical-align: middle!important;">{% endif %}
+                            {% for cve in exploitable_cve %}
+                                <tr style="vertical-align: middle!important;">
+                                    <td style="vertical-align: middle!important;text-align: center;"><a href="cve/{{cve[0]}}" target="_blank" class="btn btn-sm btn-warning btn-circle" name="btn" value="search" style="color:#202020;margin-right: 10px;">
+    <i class="fas fa-info-circle"></i>
+</a>{{ cve[0] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ cve[1] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ cve[2] }}</td>
+                                </tr style="vertical-align: middle!important;">
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><br>
+          <div class="card shadow mb-6">
+            <div class="card-body">
+              
+                <div class="table-responsive">
+                    <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> CRITICAL CVE - Details</h4>
+                    <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0" style="vertical-align: middle!important;">
+
+                        <thead style="vertical-align: middle!important;">
+                            <tr style="vertical-align: middle!important;">
+                                <th style="vertical-align: middle!important;text-align: center;">CVE ID</th>
+                                <th style="vertical-align: middle!important;text-align: center;">CVSS Score</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Status</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody style="vertical-align: middle!important;">
+   {% if not critical_cve %}<tr style="vertical-align: middle!important;"><td colspan="3" style="vertical-align: middle!important;text-align: center;"> None</td></tr style="vertical-align: middle!important;">{% endif %}
+                            {% for cve in critical_cve %}
+                                <tr style="vertical-align: middle!important;">
+                                    <td style="vertical-align: middle!important;text-align: center;"><a href="cve/{{cve[0]}}" target="_blank" class="btn btn-sm btn-warning btn-circle" name="btn" value="search" style="color:#202020;margin-right: 10px;"><i class="fas fa-info-circle"></i></a>{{ cve[0] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ cve[1] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ cve[2] }}</td>
+                                </tr style="vertical-align: middle!important;">
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br>
+          <div class="card shadow mb-6">
+            <div class="card-body">
+              
+
+                <div class="table-responsive">
+                    <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> HIGH CVE - Details</h4>
+                    <table class="table table-bordered" id="dataTable2" width="100%" cellspacing="0" style="vertical-align: middle!important;">
+
+                        <thead style="vertical-align: middle!important;">
+                            <tr style="vertical-align: middle!important;">
+                                <th style="vertical-align: middle!important;text-align: center;">CVE ID</th>
+                                <th style="vertical-align: middle!important;text-align: center;">CVSS Score</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody style="vertical-align: middle!important;">
+                            {% if not high_cve %}<tr style="vertical-align: middle!important;"><td colspan="3" style="vertical-align: middle!important;text-align: center;"> None</td></tr style="vertical-align: middle!important;">{% endif %}
+                            {% for cve in high_cve %}
+                                <tr style="vertical-align: middle!important;">
+                                    <td style="vertical-align: middle!important;text-align: center;"><a href="cve/{{cve[0]}}" target="_blank" class="btn btn-sm btn-warning btn-circle" name="btn" value="search" style="color:#202020;margin-right: 10px;"><i class="fas fa-info-circle"></i></a>{{ cve[0] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ cve[1] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ cve[2] }}</td>
+                                </tr style="vertical-align: middle!important;">
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br>
+          <div class="card shadow mb-6">
+            <div class="card-body">
+                                
+                <div class="table-responsive">
+                    <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> MEDIUM CVE - Details</h4>
+                    <table class="table table-bordered" id="dataTable3" width="100%" cellspacing="0" style="vertical-align: middle!important;">
+
+                        <thead style="vertical-align: middle!important;">
+                            <tr style="vertical-align: middle!important;">
+                                <th style="vertical-align: middle!important;text-align: center;">CVE ID</th>
+                                <th style="vertical-align: middle!important;text-align: center;">CVSS Score</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Status</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody style="vertical-align: middle!important;">
+                            {% if not medium_cve %}<tr style="vertical-align: middle!important;"><td colspan="3" style="vertical-align: middle!important;text-align: center;"> None</td></tr style="vertical-align: middle!important;">{% endif %}
+                            {% for cve in medium_cve %}
+                                <tr style="vertical-align: middle!important;">
+                                    <td style="vertical-align: middle!important;text-align: center;"><a href="cve/{{cve[0]}}" target="_blank" class="btn btn-sm btn-warning btn-circle" name="btn" value="search" style="color:#202020;margin-right: 10px;"><i class="fas fa-info-circle"></i></a>{{ cve[0] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ cve[1] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ cve[2] }}</td>
+                                </tr style="vertical-align: middle!important;">
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br>
+          <div class="card shadow mb-6">
+            <div class="card-body">
+              
+
+                <div class="table-responsive">
+                    <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> LOW CVE - Details</h4>
+                    <table class="table table-bordered" id="dataTable4" width="100%" cellspacing="0" style="vertical-align: middle!important;">
+
+                        <thead style="vertical-align: middle!important;">
+                            <tr style="vertical-align: middle!important;">
+                                <th style="vertical-align: middle!important;text-align: center;">CVE ID</th>
+                                <th style="vertical-align: middle!important;text-align: center;">CVSS Score</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Status</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody style="vertical-align: middle!important;">
+                            {% if not low_cve %}<tr style="vertical-align: middle!important;"><td colspan="3" style="vertical-align: middle!important;text-align: center;"> None</td></tr style="vertical-align: middle!important;">{% endif %}
+                            {% for cve in low_cve %}
+                                <tr style="vertical-align: middle!important;">
+                                    <td style="vertical-align: middle!important;text-align: center;"><a href="cve/{{cve[0]}}" target="_blank" class="btn btn-sm btn-warning btn-circle" name="btn" value="search" style="color:#202020;margin-right: 10px;"><i class="fas fa-info-circle"></i></a>{{ cve[0] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ cve[1] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ cve[2] }}</td>
+                                </tr style="vertical-align: middle!important;">
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br>
+          <div class="card shadow mb-6">
+            <div class="card-body">
+              
+                      
+                <div class="table-responsive">
+                    <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Without CVSS Score CVE - Details</h4>
+                    <table class="table table-bordered" id="dataTable5" width="100%" cellspacing="0" style="vertical-align: middle!important;">
+
+                        <thead style="vertical-align: middle!important;">
+                            <tr style="vertical-align: middle!important;">
+                                <th style="vertical-align: middle!important;text-align: center;">CVE ID</th>
+                                <th style="vertical-align: middle!important;text-align: center;">CVSS Score</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody style="vertical-align: middle!important;">
+                        {% if not na_cve %}<tr style="vertical-align: middle!important;"><td colspan="3" style="vertical-align: middle!important;text-align: center;"> None</td></tr style="vertical-align: middle!important;">{% endif %}
+                            {% for cve in na_cve %}
+                                <tr style="vertical-align: middle!important;">
+                                    <td style="vertical-align: middle!important;text-align: center;"><a href="cve/{{cve[0]}}" target="_blank" class="btn btn-sm btn-warning btn-circle" name="btn" value="search" style="color:#202020;margin-right: 10px;"><i class="fas fa-info-circle"></i></a>{{ cve[0] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ cve[1] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ cve[2] }}</td>
+                                </tr style="vertical-align: middle!important;">
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>   
+            </div>
+        </div>
+</div>
+        <br>
+</div>
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+{% endblock %}
+{% block js %}
+    {{ super() }}
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#dataTable1').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#dataTable2').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#dataTable3').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#dataTable4').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#dataTable5').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#dataTable6').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#dataTable7').DataTable({"pageLength": 5,"lengthMenu": [5, 10, 20, 50, 100]});
+});
+</script>
+
+    <!-- Page level plugins -->
+    <script src="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{{ url_for('static', filename='js/demo/datatables-demo.js')}}"></script>
+{% endblock %}

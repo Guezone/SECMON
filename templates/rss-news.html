@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block title %}Cybersecurity news{% endblock %} 
+{% block content %}
+<!-- SECMON by Aubin Custodio is licensed under CC BY-NC-SA 4.0 -->
+<div class="container-fluid">
+    <h1 class="h3 mb-0 text-gray-800">Cybersecurity news</h1><hr>
+    {% if no_news %}{{no_news}}{% endif %}
+    {% for rss in news %}
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> {{rss[1]}}</h4>
+            <b>Source : </b>{{rss[2]}}<br><br>
+            <b>Summary : </b>{{rss[3]}}<br><br>
+            <b>Link to the news : </b><a href="{{rss[0]}}">{{rss[0]}}</a>
+        </div>
+    </div>                
+    {% endfor %}    
+</div></div>
+{% endblock %}

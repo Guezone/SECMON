@@ -1,0 +1,38 @@
+{% extends "base.html" %} {% block title %} Tasks{% endblock %} 
+{% block content %}
+<!-- SECMON by Aubin Custodio is licensed under CC BY-NC-SA 4.0 -->
+<div class="container-fluid">
+    <h1 class="h3 mb-0 text-gray-800">Tasks</h1><hr>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Tasks list</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0" style="vertical-align: middle!important;">
+                    <thead>
+                        <tr>
+                            <th style="vertical-align: middle!important;text-align: center;">Task ID</th>
+                            <th style="vertical-align: middle!important;text-align: center;">Operation</th>
+                            <th style="vertical-align: middle!important;text-align: center;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if not tasks %}
+                        <tr>
+                            <td style="vertical-align: middle!important;text-align: center;" colspan="3">No tasks found on the last two days.</td>
+                        </tr>	  
+                    {% endif %}                      
+					{% for task in tasks %}	                        	
+                        <tr>
+                            <td style="vertical-align: middle!important;text-align: center;">{{ task[0] }}</td>
+                            <td>{{ task[1] }}</td>
+                            <td style="vertical-align: middle!important;text-align: center;color:#202020;background-color: {% if task[2] == 'Success'%}#1cc88a{% elif task[2] == 'In progress'%}#36b9cc{% elif task[2] == 'Failed'%}#e74a3b{% endif %};">{{ task[2] }}</td>
+                        </tr>
+					{% endfor %}	                      
+                    </tbody>
+                 </table>
+            </div>
+        </div>
+    </div>
+</div></div>
+
+{% endblock %} 

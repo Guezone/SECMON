@@ -1,0 +1,25 @@
+{% extends "base.html" %} {% block title %} Settings{% endblock %} 
+{% block content %}
+<!-- SECMON by Aubin Custodio is licensed under CC BY-NC-SA 4.0 -->
+<div class="container-fluid">
+    <h1 class="h3 mb-0 text-gray-800">Settings</h1><hr>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Change your password</h4>
+            <form role="form" method="post">
+                <div class="form-group col-lg-3" style="padding-left: 0rem;">
+                    <input class="form-control" placeholder="Current password" name="cur_password" type="password" value="">
+                </div>
+                <div class="form-group col-lg-3" style="padding-left: 0rem;">
+                    <input class="form-control" placeholder="New password" name="new_password" type="password" value="">
+                </div>
+                <div class="form-group col-lg-3" style="padding-left: 0rem;">
+                    <input class="form-control" placeholder="New password" name="new_password2" type="password" value="">
+                </div>
+                <!-- Change this to a button or input when using this as a form -->
+                    <button type="submit" value="Send" name="btn" class="d-none d-sm-inline-block btn btn-md btn-primary shadow-sm" style="background-color: #faaa3c;color: #262626;border-color: black;">Save changes</button>
+            </form>              
+        </div>
+    </div>
+</div></div>
+{% endblock %} 

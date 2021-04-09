@@ -1,0 +1,173 @@
+{% extends "base.html" %} {% block title %} Vulnerability management{% endblock %} 
+{% block content %}
+<style type="text/css">
+.dataTables_length {
+  padding-left: 5px !important;
+}
+}
+.hori-timeline .events {
+    border-top: 3px solid #e9ecef;
+}
+.hori-timeline .events .event-list {
+    display: block;
+    position: relative;
+    text-align: center;
+    padding-top: 70px;
+    margin-right: 0;
+}
+.hori-timeline .events .event-list:before {
+    content: "";
+    position: absolute;
+    height: 36px;
+    border-right: 2px dashed #dee2e6;
+    top: 0;
+}
+.hori-timeline .events .event-list .event-date {
+    position: absolute;
+    top: 38px;
+    left: 0;
+    right: 0;
+    width: 120px;
+    margin: 0 auto;
+    border-radius: 4px;
+    padding: 2px 4px;
+}
+@media (min-width: 1140px) {
+    .hori-timeline .events .event-list {
+        display: inline-block;
+        width: 33%;
+        padding-top: 45px;
+    }
+    .hori-timeline .events .event-list .event-date {
+        top: -12px;
+    }
+}
+.bg-soft-danger {
+    background-color: #e74a3b!important;
+}
+.bg-soft-warning {
+    background-color: #faaa3c!important;
+}
+.bg-soft-success {
+    background-color: #1cc88a!important;
+}
+.card {
+    border: none;
+    margin-bottom: 24px;
+    -webkit-box-shadow: 0 0 13px 0 rgba(236,236,241,.44);
+    box-shadow: 0 0 13px 0 rgba(236,236,241,.44);
+}
+</style>
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <h1 class="h3 mb-0 text-gray-800">Vulnerabiliy management</h1><hr>
+          <p class="mb-4">Many vulnerabilities are released every day. It is important to be able to track them in real time. This page allows you to acknowledge new vulnerabilities and mark those that are fixed.</p>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-6">
+            <div class="card-body">
+                <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Vulnerability management guideline</h4>
+                <center>
+                <div class="hori-timeline" dir="ltr">
+                    <ul class="list-inline events">
+                        <li class="list-inline-item event-list">
+                            <div class="px-4">
+                                <div class="event-date bg-soft-danger">Unread/Native</div>
+                                <h5 class="font-size-12">Alert</h5>
+                                <p class="text-muted">When a new CVE alert is raised, the status is "Unread". You should review the details of the vulnerability.</p>
+                            </div>
+                        </li>
+                        <li class="list-inline-item event-list">
+                            <div class="px-4">
+                                <div class="event-date bg-soft-warning">Read</div>
+                                <h5 class="font-size-12">Acknowledge</h5>
+                                <p class="text-muted">Once you have seen the details of the vulnerability, you should measure the impact and plan the remediation if it is high.</p>
+                            </div>
+                        </li>
+                        <li class="list-inline-item event-list">
+                            <div class="px-4">
+                                <div class="event-date bg-soft-success">Corrected</div>
+                                <h5 class="font-size-12">Correct</h5>
+                                <p class="text-muted">When the vulnerability is fixed via a configuration or a workaround, you can tag the CVE as "Corrected". </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                </center>
+                <p><b>Note :</b> If you have updated the product, go remove it and add the new version in the Administration -> Product management tab.</p>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>
+</div>
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <form role="form" method="post">
+                                <div class="form-group">
+                                  <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Change CVE status</h4>
+                                    <input class="form-control col-lg-5" name="cve" placeholder="ex : CVE-2020-1472" required="required">
+                                </div>
+                                    <button type="submit" name="btn" value="utrt" class="btn btn-danger" style="color:white;">Unread</button>
+                                    <button type="submit" name="btn" value="ack" class="btn btn-warning">Read</button>
+                                    <button type="submit" name="btn" value="trt" class="btn btn-success">Corrected</button>
+                                    <button type="submit" name="btn" value="false" class="btn btn-secondary" style="background-color: #6c757d;color:white;">False positive</button>
+                            </form>
+                        </div>
+                    </div><br>              
+            </div>
+        </div>
+
+          <!-- DataTales Example -->
+          <div class="card shadow mb-4">
+            <div class="card-body">
+              <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Vulnerabilities summary table</h4>
+              <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" id="dataTables-example" style="vertical-align: middle!important;">
+                        <thead style="vertical-align: middle!important;">
+                            <tr style="vertical-align: middle!important;">
+                                <th style="vertical-align: middle!important;text-align: center;">CVE ID</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Product</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Status</th>
+                                <th style="vertical-align: middle!important;text-align: center;">CVSS3 Score</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Publish date</th>
+                            </tr>
+                        </thead>
+                        <tbody style="vertical-align: middle!important;">
+                            {% for cve in cvelist %}
+                                <tr style="vertical-align: middle!important;">
+                                    <td style="vertical-align: middle!important;text-align: center;"><a href="cve/{{cve[0]}}" target="_blank" class="btn btn-sm btn-warning btn-circle" name="btn" value="search" style="color:#202020;margin-right: 10px;"><i class="fas fa-info-circle"></i></a>{{ cve[0] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ cve[1] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;background-color:{{ cve[9] }};color:{{ cve[10] }};">
+                                        {{ cve[2] }}
+                                    </td>
+                                    <td style="vertical-align: middle!important;font-weight: bold;text-align: center;background-color:{{ cve[11] }} ;color:{{ cve[12] }} ;">{{ cve[3] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;">{{ cve[4] }}</td>
+                                </tr style="vertical-align: middle!important;">
+                            {% endfor %}
+                        </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+{% endblock %}
+
+{% block js %}
+    {{ super() }}
+    <!-- Page level plugins -->
+    <script src="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{{ url_for('static', filename='js/demo/datatables-demo.js')}}"></script>
+{% endblock %}

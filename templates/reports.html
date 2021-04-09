@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% block title %} Reports{% endblock %} 
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+<div class="container-fluid">
+    <h1 class="h3 mb-0 text-gray-800">Reports</h1><hr>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Reports by date range</h4>
+            <div class="col-lg-3">
+                <form method="post" role="form">
+                    <label for="start">Start date:</label>
+                    <input type="date" id="start" name="start_date" class="form-control" required><br>
+                    <label for="start">End date:</label>
+                    <input type="date" id="start" name="end_date" class="form-control" required><br>
+                    <button type="submit" value="search" name="btn" class="d-none d-sm-inline-block btn btn-md btn-primary shadow-sm" style="margin: : 0px 0px;background-color: #faaa3c;color: #262626;border-color: black;">Download</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Reports with all vulnerabilities</h4>
+            <div class="col-lg-3">
+                <form method="post" role="form">
+                    <button type="submit" value="search" name="btn-full" class="d-none d-sm-inline-block btn btn-md btn-primary shadow-sm" style="margin: : 0px 0px;background-color: #faaa3c;color: #262626;border-color: black;">Download</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div></div>
+{% endblock %}

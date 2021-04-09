@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block title %} Search{% endblock %} 
+{% block content %}
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <h1 class="h3 mb-0 text-gray-800">CVE search</h1><hr>
+          <div class="card shadow mb-4">
+            <div class="card-body">
+              <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Search CVE details</h4>
+            <div class="row justify-content-start" style="padding-left: 15px;">
+                <form method="post" role="form" action="">
+                        <div class="form-group col-xs-2">
+                            <input class="form-control" required="true" name="cve" placeholder="ex : CVE-2020-1472"> 
+                        </div>
+            </div class="row">
+            <div class="row">  
+                <div class="col-mb-4 text-left justify-content-start" style="padding-left: 15px;height: 30px;">
+                  <button type="submit" value="search" name="btn" class="d-none d-sm-inline-block btn btn-md btn-primary shadow-sm" style="margin: : 0px 0px;background-color: #faaa3c;color: #262626;border-color: black;">Search</button>
+
+                </div>
+      
+            </div> 
+        </div>
+                       </div>
+            </div>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- End of Main Content -->
+{% endblock %}

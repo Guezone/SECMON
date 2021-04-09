@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block title %}About{% endblock %} 
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('serveStaticResource', resource='css/responsive.dataTables.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('serveStaticResource', resource='css/dataTables.bootstrap.css') }}">
+{% endblock %} 
+{% block content %}
+<!-- SECMON by Aubin Custodio is licensed under CC BY-NC-SA 4.0 -->
+<div class="container-fluid">
+
+  <!-- Page Heading -->
+  <h1 class="h3 mb-0 text-gray-800">About SECMON</h1><hr>
+  	<div class="card shadow mb-4" style="height: 680px;">
+    	<div class="card-body">
+			
+			<center><br><a href="/"><img src="{% if back %}{{back}}{% endif %}{{ url_for('static', filename='img/logo.png') }}" alt="unavailable" class="navbar-logo" style="height: 120px;width: 120px;"/></a><br><br><br></center>
+			Version :<b> 2.0</b><br><br>
+			<b>SECMON</b> is a real-time infosec monitoring tool that works from several sources. <br><br><br>
+
+			It works with pollers that allow you to send emails with the latest <b>CVE concerning your IT infrastructure</b> as well as the latest cyber security <b>information published on the web.</b> <br><br><br>
+
+			The Web UI allows you to manage more precisely the CVE module with multiple management functions.<br><br><br>
+
+			SECMON (by Aubin Custodio - Guezone) is licensed under <b>CC BY-NC-SA 4.0.</b> <br><br><br>
+
+			This license allows you to use SECMON, to improve it and to make it live by mentioning the author but without using it for commercial purposes. As the infosec monitoring process is quite difficult and time consuming, it should <b>only be used to help companies and/or users to secure their IT infrastructure</b> and to know the current cyberspace.<br><br><br>
+		</div>
+	</div>
+</div></div>
+{% endblock %}

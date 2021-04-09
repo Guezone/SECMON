@@ -1,0 +1,137 @@
+{% extends "base.html" %} {% block title %} Result{% endblock %} 
+{% block content %}
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <h1 class="h3 mb-0 text-gray-800">Search result for <b>{{cve_id}}</b></h1><hr>
+          <div class="card shadow mb-4">                    
+           <div class="card-body">  
+                <b>CVE ID : </b> {{cve_id}} <br><br>
+                <b>Summary : </b> <p>{{cve_summary}} <br><br>
+                <b>Is in database : </b><span style="{% if cve_dbs == True%}color:#5cb85c;{% else %}color:#dc3545;{%endif%}">{{cve_dbs}}</span><br><br>
+                <b>Publish date :</b> {{cve_date}}<br><br>
+                <b>Weakness :</b> <a href="https://cwe.mitre.org/data/definitions/{{weakness_nb}}.html" target="_blank">{{cve_weakness}}</a><br><br>
+                <b>CVSS 3 score :</b> {{cve_score}}<br><br>
+                <b>Metrics details :</b><br>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th style="vertical-align: middle!important;text-align: center;">Attack vector</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Attack Complexity</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Privileges Required</th>
+                                <th style="vertical-align: middle!important;text-align: center;">User Interaction</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Scope</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Confidentiality impact</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Integrity impact</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Availability impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="color:white;vertical-align: middle!important;text-align: center;
+                                {% if cve_av == 'NETWORK'%}background-color:#343a40;
+                                {% elif cve_av == 'ADJACENT'%}background-color:#dc3545;
+                                {% elif cve_av == 'LOCAL'%}background-color:#ffc107;
+                                {% elif cve_av == 'PHYSICAL'%}background-color:#17a2b8;
+                                {% else %}background-color:#6c757d;
+                                {% endif %}"> {{ cve_av }}</td>
+                                <td style="color:white;vertical-align: middle!important;text-align: center;
+                                {% if cve_ac == 'HIGH'%}background-color:#ffc107;
+                                {% elif cve_ac == 'LOW'%}background-color:#dc3545;
+                                {% else %}background-color:#6c757d;
+                                {% endif %}"> {{ cve_ac }}</td>
+                                <td style="color:white;vertical-align: middle!important;text-align: center;
+                                {% if cve_pr == 'NONE'%}background-color:#343a40;
+                                {% elif cve_pr == 'LOW'%}background-color:#dc3545;
+                                {% elif cve_pr == 'HIGH'%}background-color:#ffc107;
+                                {% else %}background-color:#6c757d;
+                                {% endif %}"> {{ cve_pr }}</td>
+                                <td style="color:white;vertical-align: middle!important;text-align: center;
+                                {% if cve_ui == 'NONE'%}background-color:#dc3545;
+                                {% elif cve_ui == 'REQUIRED'%}background-color:#ffc107;
+                                {% else %}background-color:#6c757d;
+                                {% endif %}"> {{ cve_ui }}</td>
+                                <td style="color:white;vertical-align: middle!important;text-align: center;
+                                {% if cve_scope == 'CHANGED'%}background-color:#dc3545;
+                                {% elif cve_scope == 'UNCHANGED'%}background-color:#ffc107;
+                                {% else %}background-color:#6c757d;
+                                {% endif %}"> {{ cve_scope }}</td>
+                                <td style="color:white;vertical-align: middle!important;text-align: center;
+                                {% if cve_confid == 'HIGH'%}background-color:#343a40;
+                                {% elif cve_confid == 'LOW'%}background-color:#dc3545;
+                                {% elif cve_confid == 'NONE'%}background-color:#17a2b8;
+                                {% else %}background-color:#6c757d;
+                                {% endif %}"> {{ cve_confid }}</td>
+                                <td style="color:white;vertical-align: middle!important;text-align: center;
+                                {% if cve_integrity == 'HIGH'%}background-color:#343a40;
+                                {% elif cve_integrity == 'LOW'%}background-color:#dc3545;
+                                {% elif cve_integrity == 'NONE'%}background-color:#17a2b8;
+                                {% else %}background-color:#6c757d;
+                                {% endif %}"> {{ cve_integrity }}</td>
+                                <td style="color:white;vertical-align: middle!important;text-align: center;
+                                {% if cve_avail == 'HIGH'%}background-color:#343a40;
+                                {% elif cve_avail == 'LOW'%}background-color:#dc3545;
+                                {% elif cve_avail == 'NONE'%}background-color:#17a2b8;
+                                {% else %}background-color:#6c757d;
+                                {% endif %}"> {{ cve_avail }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <b>Evaluation status : </b>{{cve_status}}<br><br>
+                <b>Exploit available on exploit-db or in Github : </b><span style="{% if cve_expa == False%}color:#5cb85c;{% else %}color:#dc3545;{%endif%}">{{cve_expa}}</span><br><br>
+                <b>Affected products : </b><br>
+                        {% if cve_cpe == ['N/A'] %}
+                            N/A<br>
+                        {% else %} 
+                            <div class="panel-body">
+                                    <table class="table table-striped table-bordered table-hover">
+                                        <thead style="vertical-align: middle!important;">
+                                            <tr style="vertical-align: middle!important;">
+                                                <th style="vertical-align: middle!important;text-align: center;">Type</th>
+                                                <th style="vertical-align: middle!important;text-align: center;">Vendor</th>
+                                                <th style="vertical-align: middle!important;text-align: center;">Product</th>
+                                                <th style="vertical-align: middle!important;text-align: center;">Version</th>
+                                                <th style="vertical-align: middle!important;text-align: center;">In my product list</th>
+                                                <th style="vertical-align: middle!important;text-align: center;">CPE</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="vertical-align: middle!important;">
+                                            {% for product in cve_cpe %}
+                                                <tr style="vertical-align: middle!important;">
+                                                    <td style="vertical-align: middle!important;text-align: center;">{{ product[0] }}</td>
+                                                    <td style="vertical-align: middle!important;text-align: center;"> {{ product[1] }}</td>
+                                                    <td style="vertical-align: middle!important;text-align: center;"> {{ product[2] }}</td>
+                                                    <td style="vertical-align: middle!important;text-align: center;">{{ product[3] }}</td>
+                                                    <td style="vertical-align: middle!important;text-align: center;">{{ product[5] }}</td>
+                                                    <td style="vertical-align: middle!important;text-align: center;">{{ product[4] }}</td>
+                                                </tr style="vertical-align: middle!important;">
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>    
+                            </div>
+                            {% endif %}  
+                        <br>
+                <b>Sources : </b><br>
+
+                <p>
+                        {% for link in cve_sources %}
+                            <a href="{{link}}" target="_blank">{{link}}</a><br>
+                        {% endfor %}
+                        <br>
+                </p>
+            </div>
+            <center>
+                <a href="{{back_path}}"><button type="submit"class="btn btn-secondary" style="background-color: #faaa3c;color:#262626;margin-bottom: 20px;"><b>Back to search</b></button></a>
+                <a href="https://nvd.nist.gov/vuln/detail/{{cve_id}}" target="_blank"><button type="submit"  class="btn btn-secondary" style="background-color: #faaa3c;color:#262626;margin-bottom: 20px;"><b>NVD LINK</b></button></a>
+            </center>
+        </div></div>
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block title %}Last logs{% endblock %} 
+{% block content %}
+<!-- SECMON by Aubin Custodio is licensed under CC BY-NC-SA 4.0 -->
+<div class="container-fluid">
+    <h1 class="h3 mb-0 text-gray-800">Last logs view</h1><hr>
+        <div class="col-lg-12">
+            <textarea readonly style="overflow-x: scroll;margin-left:-12px;resize: none;width: 100%;height: 680px;white-space: pre;">
+                 {% for log in logs %}
+{{log}}
+                 {% endfor %}
+            </textarea>
+        </div>
+</div></div>
+{% endblock %}
