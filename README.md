@@ -33,7 +33,7 @@ Email alerts can be sent in English or French.
 CVE are polled using two methods of collection/correspondence: 
 
 - **Keyword-based** : allows you to be proactive on the retrieval of CVE by leaving a little bit of precision (no version check, just word matching) on the affected products (ex: "VMWare", "Apache").
-- **Based on CPE** (Common Platform Enumeration) : allows the retrieval of CVE that only concern the product version entered (e.g. "Windows 10 1909", "Apache 2.4.38")
+- **CPE based** (Common Platform Enumeration) : allows the retrieval of CVE that only concern the product version entered (e.g. "Windows 10 1909", "Apache 2.4.38")
 
 ## Requirements
 SECMON requires registration on Github API for exploits retrieval. It also requires : 
@@ -41,7 +41,7 @@ SECMON requires registration on Github API for exploits retrieval. It also requi
 - OS : Linux-based system (tested on Debian 10)
 - Environnement : Python 3 (tested on Python 3.9 and Python 3.8)
 
-**WARNING** : Web UI credentials are hashed (SHA512 with salt), on the other hand, the Twitter API connection credentials and the application session key are neither encrypted nor hashed. All data is stored in an unencrypted sqlite database. A few advices :
+**WARNING** : Web UI credentials are hashed (SHA512 with salt), on the other hand, the Github API connection credentials and the application session key are neither encrypted nor hashed. All data is stored in an unencrypted sqlite database. A few advices :
 
 - Allow access to this machine only to persons who are authorized to do so.
 - Isolate the host machine from the rest.

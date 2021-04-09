@@ -1,24 +1,25 @@
 # Table of contents
+- [Table of contents](#table-of-contents)
 - [Installation](#installation)
-  * [With docker](#with-docker)
-    + [Autosetup](#autosetup)
-    + [Automation](#automation)
-  * [Without docker](#without-docker)
-    + [Setup](#setup)
-    + [Automation](#automation-1)
-    + [Startup](#startup)
-    + [Configuration of the web service](#configuration-of-the-web-service)
+  - [With docker](#with-docker)
+    - [Autosetup](#autosetup)
+    - [Automation](#automation)
+  - [Without docker](#without-docker)
+    - [Setup](#setup)
+    - [Automation](#automation-1)
+    - [Startup](#startup)
+    - [Configuration of the web service](#configuration-of-the-web-service)
 - [Login](#login)
 - [Configuration](#configuration)
-  * [Search products](#search-products)
-  * [Add your products](#add-your-products)
-  * [User interface](#user-interface)
-    + [CVE Module](#cve-module)
-    + [RSS Module](#rss-module)
-    + [Settings](#settings)
+  - [Search products](#search-products)
+  - [Add your products](#add-your-products)
+  - [User interface](#user-interface)
+    - [CVE Module](#cve-module)
+    - [RSS Module](#rss-module)
+    - [Settings](#settings)
 - [Logging](#logging)
-  * [Useful logs](#useful-logs)
-  * [Error logs](#error-logs)
+  - [Useful logs](#useful-logs)
+  - [Error logs](#error-logs)
 
 # Installation
 
@@ -292,10 +293,8 @@ Refreshing EDBID-CVE mapping
 100% (43828 of 43828) |###############################################################################################| Elapsed Time: 0:00:00 Time:  0:00:00
 Exploit found for CVE-2021-3156 from Exploit-DB
 Exploit found for CVE-2014-8380 from Exploit-DB
-Exploit found for CVE-2021-3156 from Exploit-DB
 
 Search Github Exploit for registered CVE...
-Exploit found for CVE-2020-1590 from Github
 Exploit found for CVE-2020-1590 from Github
 
 Updating high risk product list....
@@ -432,7 +431,7 @@ BigIP
 Extreme
 ```
 
-**Note**: when you add a CPE reference, it may take several minutes or even several hours for all the CVEs to be recorded in the database. To follow the progress, go to the tab **Settings -> Tasks**
+**Note**: when you add a CPE reference, it may take several minutes or even several hours for all the CVEs to be recorded in the database. To follow the progress, go to the tab **Settings -> Tasks**. A good practice might be to set the keywords to match your CPE references ("Docker" as a keyword and "cpe:2.3:a:docker:docker:0.2.1:*:*:*:*:*:*"as a CPE).
 
 ## User interface
 
@@ -474,9 +473,9 @@ Obviously, I encourage you to create alerts if you have a SIEM to manage critica
 
 Here is an example of field extractions (Graylog compatible file): 
 
-**Note: you can obviously reuse the **Grok patterns** contained in the file to extract fields on your log collection and analysis tools.
+**Note**: you can obviously reuse the **Grok patterns** contained in the file to extract fields on your log collection and analysis tools.
 
-```
+```json
 {
   "extractors": [
     {
