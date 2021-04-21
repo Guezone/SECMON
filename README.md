@@ -11,7 +11,7 @@
 
 SECMON is a **web-based tool** for the automation of **infosec watching** and **vulnerability management** with a web interface.
 
-A demo is available [here](https://secmon.guezone.info/).
+A demo is available [here](https://secmon.guezone.info/). A Discord channel is available [here](https://discord.gg/cXzvb4fKzE)
 
 ## Features
 
