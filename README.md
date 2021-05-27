@@ -11,7 +11,7 @@
 
 SECMON is a **web-based tool** for the automation of **infosec watching** and **vulnerability management** with a web interface.
 
-A demo is available [here](https://secmon.guezone.info/).
+A demo is available [here](https://secmon.guezone.info/). A Discord channel is available [here](https://discord.gg/cXzvb4fKzE)
 
 ## Features
 
@@ -104,6 +104,7 @@ This license allows you to **use** SECMON, to **improve it** and to make it live
 
 - [x] Automate the deployment with docker
 - [x] First security auditing (front-end only)
+- [ ] Create script to allow CPE scanning on Windows and Linux based system
 - [ ] Add new sources of cyber-news
 - [ ] Polling CVE via local JSON NIST file
 - [X] Write user documentation for the Web UI
