@@ -447,15 +447,14 @@ def returnUsername():
     dir_path = script_path.replace("secmon_lib.py","")
     con = sqlite3.connect(dir_path+'secmon.db')
     cur = con.cursor()
-    username = ""
     db_result = cur.execute("SELECT username FROM users")
     for data in db_result:
         for users in data:
-            username = users
-    if is_logged_in(username):
-        return username
-    else:
-        return "Not logged !!!"
+            if is_logged_in(users):
+                return users
+            else:
+                continue
+    return "Not logged !!!"
 def deleteProduct(ptype, key_or_cpe):    
     if ptype == "CPE":
         high_risk_products = getHighRiskProducts("cpe")

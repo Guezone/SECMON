@@ -80,30 +80,69 @@ def home():
 @login_required
 def settings():
 	if request.method == 'POST':
-		cur_password = request.form['cur_password']
-		new_password = request.form['new_password']
-		new_password2 = request.form['new_password2']
-		if new_password == new_password2:
+		if request.form['btn'] == "Send":
+			cur_password = request.form['cur_password']
+			new_password = request.form['new_password']
+			new_password2 = request.form['new_password2']
+			if new_password == new_password2:
+				script_path = os.path.abspath(__file__)
+				dir_path = script_path.replace("secmon_web.py","")
+				con = sqlite3.connect(dir_path+'secmon.db')
+				cur = con.cursor()
+				db_hash = ""
+				current_user = returnUsername()
+				db_result = cur.execute("SELECT pass_hash FROM users WHERE username = (?)", (current_user,))
+				for data in db_result:
+					for pwd in data:
+						db_hash += pwd
+				if check_password_hash(db_hash,cur_password):
+					cur.execute("UPDATE users SET pass_hash = (?) WHERE username = (?)", (generate_password_hash(new_password,"sha512"),current_user))
+					con.commit()
+					flash("The password has been changed successfully.","success")
+					return render_template('settings.html')
+				else:
+					flash("Bad current password.","danger")
+					return render_template('settings.html')	
+			else:
+				flash("The passwords do not match.","danger")
+				return render_template('settings.html')
+		elif request.form['btn'] == "NewUser":
+			username = request.form['username']
+			password = request.form['password']
+			password2 = request.form['password2']
+			if password == password2:
+				script_path = os.path.abspath(__file__)
+				dir_path = script_path.replace("secmon_web.py","")
+				con = sqlite3.connect(dir_path+'secmon.db')
+				cur = con.cursor()
+				result = []
+				current_user = returnUsername()
+				db_result = cur.execute("SELECT username FROM users")
+				for data in db_result:
+					for usr in data:
+						result.append(usr)
+				if username not in result:
+					hashed_pwd = generate_password_hash(password, 'sha512')
+					cur = con.cursor()
+					cur.execute("INSERT INTO users (username, pass_hash) VALUES (?,?);", (username, hashed_pwd))
+					con.commit()
+					flash(f"User {username} successfully created.","success")
+					return render_template('settings.html')
+				else:
+					flash(f"Failed to create {username} user because it already exist.","danger")
+					return render_template('settings.html')	
+			else:
+				flash("The passwords do not match.","danger")
+				return render_template('settings.html')			
+		else:
 			script_path = os.path.abspath(__file__)
 			dir_path = script_path.replace("secmon_web.py","")
 			con = sqlite3.connect(dir_path+'secmon.db')
 			cur = con.cursor()
-			db_hash = ""
-			db_result = cur.execute("SELECT pass_hash FROM users WHERE uid = 1")
-			for data in db_result:
-				for pwd in data:
-					db_hash = pwd
-			if check_password_hash(db_hash,cur_password):
-				cur.execute("UPDATE users SET pass_hash = (?) WHERE uid = 1", (generate_password_hash(new_password,"sha512"),))
-				con.commit()
-				flash("The password has been changed successfully.","success")
-				return render_template('settings.html')
-			else:
-				flash("Bad current password.","danger")
-				return render_template('settings.html')	
-		else:
-			flash("The passwords do not match.","danger")
-			return render_template('settings.html')				
+			current_user = returnUsername()
+			db_result = cur.execute("DELETE FROM users WHERE username = (?)", (current_user,))
+			con.commit()
+			return redirect('logout')
 	else:
 		return render_template('settings.html')
 
