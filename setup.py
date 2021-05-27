@@ -18,7 +18,6 @@ from getpass import getpass
 rss_feeds = [ 
     'https://cyware.com/allnews/feed',
     'https://www.cshub.com/rss/categories/attacks',
-    'https://www.darkreading.com/rss_simple.asp',
     'https://www.schneier.com/feed/atom/',
     'https://www.cshub.com/rss/categories/cloud' ,
     'https://www.cshub.com/rss/categories/iot',

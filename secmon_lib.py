@@ -31,7 +31,6 @@ from datetime import *
 rss_feeds = [ 
     'https://cyware.com/allnews/feed',
     'https://www.cshub.com/rss/categories/attacks',
-    'https://www.darkreading.com/rss_simple.asp',
     'https://www.schneier.com/feed/atom/',
     'https://www.cshub.com/rss/categories/threat-defense',
     'https://www.cshub.com/rss/categories/malware',
