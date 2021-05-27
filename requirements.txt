@@ -1,4 +1,4 @@
-Jinja2==2.11.2
+Jinja2==3.0.1
 Werkzeug==1.0.1
 Flask_SQLAlchemy==2.4.4
 requests==2.22.0
