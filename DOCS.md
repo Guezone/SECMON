@@ -39,12 +39,22 @@ You will be able to search and add new products after installation via the web U
 
 With the docker installation, everything is automated. The script creates a self-signed certificate if you wish and configures apache. Obviously, you can change the configuration according to your needs.
 
+The installation with Docker allows via a volume (-v option) to easily update SECMON with Git.
+
+To update it, you will have to : 
+- Go to the folder where SECMON was cloned at installation
+- Add the current folder as a local repo
+- Do a git pull to get the changes
+
+The files will then be modified directly in your SECMON container.
+
+
 ### Autosetup
 ```bash
 sudo git clone https://github.com/Guezone/SECMON && cd SECMON
 docker build . -t secmon:latest
 docker network create --driver=bridge --subnet=10.10.10.0/24 --gateway=10.10.10.254 SECMON_NET
-docker run -i -t --hostname secmonsrv --ip 10.10.10.100 --name secmon-srv --network SECMON_NET --expose 80 --expose 443 -d secmon:latest
+docker run -i -t --hostname secmonsrv --ip 10.10.10.100 --name secmon-srv -v YOUR_CURRENT_PARENT_PATH/SECMON/:/var/www/secmon --network SECMON_NET --expose 80 --expose 443 -d secmon:latest
 docker exec -it secmon-srv python3 /var/www/secmon/docker/install.py
 ```
 ```
