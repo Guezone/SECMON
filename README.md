@@ -19,6 +19,7 @@ A demo is available [here](https://secmon.guezone.info/). A Discord channel is a
 - **Mail alerting** when a "cyber-security" news are published: new threats, recent attacks, events, etc.
 - Visualize the **high security risk products** present on your IT infrastructure
 - Download CVE **Excel report** by date range
+- Display **top cybersecurity subject** (**Light cyber landscape**)
 - Logs **easy to integrate in a SIEM** (verified on **Splunk** and **Graylog**)
 - View the **latest CVE** and **latest news related to cyber security are published**
 - Assign a buffer of **management status of a CVE**
@@ -65,6 +66,10 @@ SECMON requires registration on Github API for exploits retrieval. It also requi
 
 <p align="center"><i>Exploit search</i></p>
 
+![](https://github.com/Guezone/SECMON/blob/master/img/cyber-threats.png)
+
+<p align="center"><i>Cyber threats top subject</i></p>
+
 ![](https://github.com/Guezone/SECMON/blob/master/img/product-search.png)
 
 <p align="center"><i>Product search</i></p>
@@ -100,13 +105,19 @@ This license allows you to **use** SECMON, to **improve it** and to make it live
 - Web UI - new boostrap template 
 - Work on the Docker automation part
 
+**2.1 :**
+
+- Improved auto docker configuration (to improve updates with git and volume)
+- Added a **Cyber Threats** section that highlights the top cyber topics reported in the RSS module
+- Update of README and DOCS (docker, update & screenshots part)
+- Prioritisation of the CPE polling method over the keyword method
+
 # Roadmap
 
 - [x] Automate the deployment with docker
 - [x] First security auditing (front-end only)
 - [ ] Create script to allow CPE scanning on Windows and Linux based system
 - [ ] Add new sources of cyber-news
-- [ ] Polling CVE via local JSON NIST file
 - [X] Write user documentation for the Web UI
 - [ ] Create a REST API for calling in other applications
 - [x] Write the logs in a standard format and plan to send them to a third party of SIEM type.

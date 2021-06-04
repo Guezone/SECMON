@@ -17,6 +17,7 @@
     - [CVE Module](#cve-module)
     - [RSS Module](#rss-module)
     - [Settings](#settings)
+- [Upgrade](#upgrade)
 - [Logging](#logging)
   - [Useful logs](#useful-logs)
   - [Error logs](#error-logs)
@@ -472,6 +473,27 @@ Extreme
 **SMTP Configuration**: allows you to change the SMTP configuration linked to sending CVE alerts or news.
 
 **Tasks**: allows you to view the status of recent tasks which are heavy for SECMON. Today, only the addition of products appears here as it is a process that can be very long.
+
+You can update your web UI password and also add users. To do this, click on the menu at the top right and then go to **Account settings**.
+
+**Note** : It is currently impossible to reset passwords via a token and email as is usually the case.
+
+# Upgrade
+
+The installation of SECMON with Docker allows the use of a volume in order to have a "synchronisation" between the host and the container.
+
+If you want to have the latest version of SECMON with the latest changes, go to the folder where SECMON was cloned (on the host) and run the following commands:
+
+```
+git pull origin
+sudo chown -R www-data:www-data .
+sudo chmod -R 744 .
+sudo docker exec -it secmon-srv service apache2 restart
+```
+
+The files will be updated on the host side and in the container and SECMON will be updated.
+
+If you are not using docker, you can do the same in the folder where the repository was cloned. However, you will need to copy the modified files to **/var/www/secmon** and also assign the correct rights. You will also have to restart the Apache service.
 
 # Logging
 

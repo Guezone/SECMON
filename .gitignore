@@ -1,3 +1,4 @@
 secmon.db
 logs.txt
 __pycache__/
+stats.py
