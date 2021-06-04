@@ -29,7 +29,7 @@ A demo is available [here](https://secmon.guezone.info/). A Discord channel is a
 - **Manage your product list**: search/add/delete a product, display your referenced product list
 - **Monitor the sources** used by pollers 
 
-Email alerts can be sent in English or French. 
+Email alerts can be sent in English or French. SECMON web UI now support multi user account.
 
 CVE are polled using two methods of collection/correspondence: 
 
@@ -100,6 +100,7 @@ This license allows you to **use** SECMON, to **improve it** and to make it live
 
 **2.0 :**
 
+
 - Modification of the log format
 - Reporting method (generation via dates)
 - Web UI - new boostrap template 
@@ -107,6 +108,7 @@ This license allows you to **use** SECMON, to **improve it** and to make it live
 
 **2.1 :**
 
+- Add a multi-user support on Web UI
 - Improved auto docker configuration (to improve updates with git and volume)
 - Added a **Cyber Threats** section that highlights the top cyber topics reported in the RSS module
 - Update of README and DOCS (docker, update & screenshots part)
