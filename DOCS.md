@@ -53,10 +53,10 @@ The files will then be modified directly in your SECMON container.
 ### Autosetup
 ```bash
 sudo git clone https://github.com/Guezone/SECMON && cd SECMON
-docker build . -t secmon:latest
-docker network create --driver=bridge --subnet=10.10.10.0/24 --gateway=10.10.10.254 SECMON_NET
-docker run -i -t --hostname secmonsrv --ip 10.10.10.100 --name secmon-srv -v YOUR_CURRENT_PARENT_PATH/SECMON/:/var/www/secmon --network SECMON_NET --expose 80 --expose 443 -d secmon:latest
-docker exec -it secmon-srv python3 /var/www/secmon/docker/install.py
+sudo docker build . -t secmon:latest
+sudo docker network create --driver=bridge --subnet=10.10.10.0/24 --gateway=10.10.10.254 SECMON_NET
+sudo docker run -i -t --hostname secmonsrv --ip 10.10.10.100 --name secmon-srv -v YOUR_CURRENT_PARENT_PATH/SECMON/:/var/www/secmon --network SECMON_NET --expose 80 --expose 443 -d secmon:latest
+sudo docker exec -it secmon-srv python3 /var/www/secmon/docker/install.py
 ```
 ```
 | SECMON - DockerAutoInstall |
