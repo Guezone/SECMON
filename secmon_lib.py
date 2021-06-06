@@ -614,6 +614,7 @@ def registerNewCve(cve_id,reason,product):
                 cve_score = "N/A"
                 cve_date = "N/A"
                 cve_cpe = "N/A"
+                cve_description = "N/A"
 
             if cve_cpe == "":
                 cve_cpe = "N/A"
