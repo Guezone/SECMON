@@ -118,9 +118,10 @@ This license allows you to **use** SECMON, to **improve it** and to make it live
 
 - [x] Automate the deployment with docker
 - [x] First security auditing (front-end only)
+- [x] Write the logs in a standard format and plan to send them to a third party of SIEM type.
+- [X] Write user documentation for the Web UI
 - [ ] Create script to allow CPE scanning on Windows and Linux based system
 - [ ] Add new sources of cyber-news
-- [X] Write user documentation for the Web UI
 - [ ] Create a REST API for calling in other applications
-- [x] Write the logs in a standard format and plan to send them to a third party of SIEM type.
 - [ ] Send CVE daily update report (new high risk product, CVSS changes, affected product changes, new exploitable CVE)
+- [ ] Add a LDAP(S) authentication support
