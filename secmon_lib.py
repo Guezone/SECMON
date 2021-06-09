@@ -147,11 +147,13 @@ def generateCveReport(start_date,end_date,isFull):
             sheet["{}1".format(letter)].value = fr[i]
             i+=1
         else:
+            letter = cols[i]
             sheet["{}1".format(letter)].font = bold_font
             sheet["{}1".format(letter)].alignment = center_aligned_text
             sheet["{}1".format(letter)].border = square_border
             sheet["{}1".format(letter)].fill = title_bg
-            sheet["{}1".format(letter)].value = en[i]            
+            sheet["{}1".format(letter)].value = en[i]
+            i+=1            
     cves = []
     script_path = os.path.abspath(__file__)
     dir_path = script_path.replace("secmon_lib.py","")
