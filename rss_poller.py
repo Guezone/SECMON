@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ 
 SECMON - Source code of the SECMON rss poller script.
 """

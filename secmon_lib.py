@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ 
 SECMON - Library for SECMON python web backend.
 """
