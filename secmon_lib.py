@@ -618,6 +618,7 @@ def registerNewCve(cve_id,reason,product):
                 cve_date = "N/A"
                 cve_cpe = "N/A"
                 cve_description = "N/A"
+                cve_status = "N/A"
 
             if cve_cpe == "":
                 cve_cpe = "N/A"
@@ -627,7 +628,9 @@ def registerNewCve(cve_id,reason,product):
             elif reason == "NewPolling":
                 status = "Unread"
             elif reason == "Setup":
-                status = "Native"        
+                status = "Native"
+            else:
+                status = "N/A"        
             cur.execute("INSERT INTO CVE_DATA (CVE_ID,KEYWORD,STATUS,CVE_SCORE,CVE_DATE,CVE_DESCRIPTION,CVE_EVAL,CVE_CPE,CVE_SOURCES,EXPLOIT_FIND,INDEXING_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?);", (cve_id,key_match,status,str(cve_score),cve_date,cve_description,cve_status,cve_cpe,cve_sources,"False",idx_date))
             con.commit()
             return "ok"
