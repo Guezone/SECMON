@@ -541,6 +541,7 @@ def deleteProduct(ptype, key_or_cpe):
             return "OK"
         except:
             return "NOK"
+
 def registerNewCve(cve_id,reason,product):
     try:
         now_date = str(datetime.now()).split(" ")[0].split("-")
@@ -561,7 +562,10 @@ def registerNewCve(cve_id,reason,product):
             nvd_base_url = "https://services.nvd.nist.gov/rest/json/cve/1.0/"
             nvd_query = nvd_base_url+cve_id
             nvd_response = requests.get(url=nvd_query)
-            nvd_data = nvd_response.json()
+            try:
+                nvd_data = nvd_response.json()
+            except:
+                pass
             if 'result' in nvd_data.keys():
                 if 'reference_data' in nvd_data['result']['CVE_Items'][0]['cve']['references']:
                     nvd_links = nvd_data['result']['CVE_Items'][0]['cve']['references']['reference_data']
@@ -637,7 +641,7 @@ def registerNewCve(cve_id,reason,product):
         else:
             return "already"
     except Exception as e:
-        print("ERROR")
+        print("ERROR when SECMON would to register this CVE : ",cve_id)
         handleException(e)
 def addProduct(ptype, key_or_cpe):
     task_id = random.randint(10000,99999)
