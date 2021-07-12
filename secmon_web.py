@@ -575,6 +575,8 @@ def cveInfos(cve_id):
 	infos = getUnregisteredCveInfos(cve_id)
 	if infos['cve_weakness'] != "N/A":
 		weakness_nb = infos['cve_weakness'].split("-")[1]
+	else:
+		weakness_nb = "N/A"
 	return render_template('result.html',back_path="../../vuln-mgmt",cve_id=infos['cve_id'] ,cve_summary=infos['cve_description'],cve_dbs=infos['cve_dbs'],cve_date=infos['cve_date'],cve_score=infos['cve_score'],cve_status=infos['cve_status'],cve_cpe=infos['cve_cpe'],cve_sources=infos['cve_sources'],cve_av=infos['cve_av'],cve_ac=infos['cve_ac'],cve_pr=infos['cve_pr'],cve_ui=infos['cve_ui'],cve_scope=infos['cve_scope'],cve_confid=infos['cve_confid'],cve_integrity=infos['cve_integrity'],cve_avail=infos['cve_avail'],cve_expa=infos['cve_expa'],cve_weakness=infos['cve_weakness'],weakness_nb=weakness_nb,back="../../")
 
 
