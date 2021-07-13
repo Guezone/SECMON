@@ -775,26 +775,29 @@ def getCveByProduct(product,sleeping):
     return critical_cve, high_cve, medium_cve, low_cve, na_cve, exploitable_cve
 
 def getParsedCpe(cpe):
-    cpe = cpe.replace("*","- All versions")
-    current_product = []
-    disassmbled_cpe = cpe.split(":")
-    pvendor = disassmbled_cpe[3].replace("_"," ").title()
-    pproduct = disassmbled_cpe[4].replace("_"," ").title()
-    subversion_infos = "("+disassmbled_cpe[6] +" "+ disassmbled_cpe[7] +" "+ disassmbled_cpe[8]+")"
-    subversion_infos = subversion_infos.replace("- All versions","").replace(" - All versions","").replace("   )",")").replace("  )",")").replace(" )",")").replace("(   ","(").replace("(  ","(").replace("( ","(")
-    if subversion_infos == "()" or subversion_infos == " " or subversion_infos == "( )":
-        subversion_infos = ""
-    try:    
-        pversion = disassmbled_cpe[5].title()
-    except Exception as e:
-        handleException(e)
-        pversion = ""
-    if pversion == "-":
-        product = pvendor+" "+pproduct
-    else:
-        product = pvendor+" "+pproduct+" "+pversion + subversion_infos
-
-    return product
+    try:
+        cpe = cpe.replace("*","- All versions")
+        current_product = []
+        disassmbled_cpe = cpe.split(":")
+        pvendor = disassmbled_cpe[3].replace("_"," ").title()
+        pproduct = disassmbled_cpe[4].replace("_"," ").title()
+        subversion_infos = "("+disassmbled_cpe[6] +" "+ disassmbled_cpe[7] +" "+ disassmbled_cpe[8]+")"
+        subversion_infos = subversion_infos.replace("- All versions","").replace(" - All versions","").replace("   )",")").replace("  )",")").replace(" )",")").replace("(   ","(").replace("(  ","(").replace("( ","(")
+        if subversion_infos == "()" or subversion_infos == " " or subversion_infos == "( )":
+            subversion_infos = ""
+        try:    
+            pversion = disassmbled_cpe[5].title()
+        except Exception as e:
+            handleException(e)
+            pversion = ""
+        if pversion == "-":
+            product = pvendor+" "+pproduct
+        else:
+            product = pvendor+" "+pproduct+" "+pversion + subversion_infos
+        return product
+    except:
+        print("Unable to parse this CPE :",cpe)
+        return "Unparsed product : "+cpe
 def getProductInfos(product):
 	current_product = []
 	if "cpe" in product:
