@@ -802,7 +802,7 @@ def getProductInfos(product):
 	current_product = []
 	if "cpe" in product:
 		secmon_ptype = "CPE"
-		fcpe = product
+        fcpe = product
 		cpe = product.replace("*","All")
 		disassmbled_cpe = product.split(":")
 		cpeptype = disassmbled_cpe[2]
@@ -909,13 +909,16 @@ def showProducts(ptype_search):
                 ptype = "Application"
             else:
                 ptype = "Hardware"
-            pvendor = disassmbled_cpe[3].replace("_"," ")
-            pproduct = disassmbled_cpe[4].replace("_"," ")
+
             try:    
+                pvendor = disassmbled_cpe[3].replace("_"," ")
+                pproduct = disassmbled_cpe[4].replace("_"," ")
                 pversion = disassmbled_cpe[5]
             except Exception as e:
                 handleException(e)
                 pversion = "All"
+                pvendor = "N/A"
+                pproduct = "N/A"
             current_product.append(ptype)
             current_product.append(pvendor)
             current_product.append(pproduct)
