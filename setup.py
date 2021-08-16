@@ -36,9 +36,9 @@ rss_feeds = [
     'https://www.zataz.com/feed/'
 ]
 
-def mailTester(sender, passwd, smtpsrv, port, tls, receivers, language):
+def mailTester(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, language):
     print()
-    configBuilder(sender, passwd, smtpsrv, port, tls, receivers, language)
+    configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, language)
     buildRSSList(rss_feeds)
     buildCVEList(language)
     script_path = os.path.abspath(__file__)
@@ -88,10 +88,10 @@ def mailTester(sender, passwd, smtpsrv, port, tls, receivers, language):
             if tls == "yes":
                 smtpserver.ehlo()
                 smtpserver.starttls()
-                smtpserver.login(sender, passwd)
+                smtpserver.login(smtp_login, smtp_passwd)
                 smtpserver.sendmail(sender, receiver, msg.as_string())
             elif tls == "no":
-                smtpserver.login(sender, passwd)
+                smtpserver.login(smtp_login, smtp_passwd)
                 smtpserver.sendmail(sender, receiver, msg.as_string())
             else:
                 print("You must specify if you want to use TLS(-tls yes|no). Exit.")
@@ -163,7 +163,7 @@ def buildCVEList(language):
                     time.sleep(5)
     print("Successful build database.\n")
 
-def configBuilder(sender, passwd, smtpsrv, port, tls, receiver, language):
+def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver, language):
     script_path = os.path.abspath(__file__)
     dir_path = script_path.replace("setup.py","")
     try:
@@ -171,11 +171,11 @@ def configBuilder(sender, passwd, smtpsrv, port, tls, receiver, language):
         os.system(f"chmod 777 {dir_path}logs.txt")
     except:
         pass
-    enc_pass = (str(base64.b64encode(passwd.encode("UTF-8"))).replace("b'","")).replace("'","")
+    enc_pass = (str(base64.b64encode(smtp_passwd.encode("UTF-8"))).replace("b'","")).replace("'","")
     if os.path.isfile(dir_path+"secmon.db"):
         os.remove(dir_path+"secmon.db")
     con = sqlite3.connect(dir_path+'secmon.db')
-    con.execute('''CREATE TABLE config ([key] INTEGER PRIMARY KEY,[sender] text,[password] text,[smtpsrv] text,[port] text,[receiver] text,[tls] text,[language] text,[github_api_key] text,[github_username] text,[cvss_alert_limit] text,[no_score_cve_alert] text)''')
+    con.execute('''CREATE TABLE config ([key] INTEGER PRIMARY KEY,[sender] text,[smtp_login] text,[smtp_password] text,[smtpsrv] text,[port] text,[receiver] text,[tls] text,[language] text,[github_api_key] text,[github_username] text,[cvss_alert_limit] text,[no_score_cve_alert] text)''')
     con.execute('''CREATE TABLE keyword_list ([key] INTEGER PRIMARY KEY,[keyword] text)''')
     con.execute('''CREATE TABLE cpe_list ([key] INTEGER PRIMARY KEY,[cpe] text)''')
     con.commit()
@@ -189,10 +189,10 @@ def configBuilder(sender, passwd, smtpsrv, port, tls, receiver, language):
             keyword_conf.append(k)
         for k in keyword_conf:
             con.execute("INSERT INTO keyword_list (keyword) VALUES (?);", (k,))
-        con.execute("INSERT INTO config (sender,password,smtpsrv,port,receiver,tls,language) VALUES (?,?,?,?,?,?,?);", (sender,enc_pass,smtpsrv,str(port),receiver,tls,language))
+        con.execute("INSERT INTO config (smtp_login,smtp_password,smtpsrv,port,sender, receiver,tls,language) VALUES (?,?,?,?,?,?,?,?);", (smtp_login,enc_pass,smtpsrv,str(port),sender, receiver,tls,language))
         con.commit()         
     elif key_choice == "n" or key_choice == "N": 
-        con.execute("INSERT INTO config (sender,password,smtpsrv,port,receiver,tls,language) VALUES (?,?,?,?,?,?,?);", (sender,enc_pass,smtpsrv,str(port),receiver,tls,language))
+        con.execute("INSERT INTO config (smtp_login,smtp_password,smtpsrv,port,sender, receiver,tls,language) VALUES (?,?,?,?,?,?,?,?);", (smtp_login,enc_pass,smtpsrv,str(port),sender, receiver,tls,language))
         con.commit()         
     else:
         print("\nPlease choose if you want to use keywords or not... Exiting.")
@@ -254,7 +254,8 @@ def configBuilder(sender, passwd, smtpsrv, port, tls, receiver, language):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-sender",nargs=1,required=True,metavar="email-addr",help="set sender email address")
-    parser.add_argument("-p",nargs=1,required=True,metavar="your_password",help="set sender SMTP password")
+    parser.add_argument("-login",nargs=1,required=True,metavar="smtp_login",help="set SMTP login")
+    parser.add_argument("-p",nargs=1,required=True,metavar="smtp_password",help="set sender SMTP password")
     parser.add_argument("-server",nargs=1,required=True,metavar="smtp_server",help="set SMTP server name")
     parser.add_argument("-port",nargs=1,required=True,metavar="port",help="set SMTP port used by the server", type=int)
     parser.add_argument("-tls",nargs=1,required=True,metavar="yes|no",help="use TLS for SMTP authentication")
@@ -262,7 +263,8 @@ def main():
     parser.add_argument("-lang",nargs=1,required=True,metavar="en|fr",help="set the language of the emails")
     args = parser.parse_args()
     sender = ''.join(args.sender)
-    passwd = ''.join(args.p)
+    smtp_login = ''.join(args.login)
+    smtp_passwd = ''.join(args.p)
     server = ''.join(args.server)
     port = args.port[0]
     tls = ''.join(args.tls)
@@ -273,8 +275,8 @@ def main():
     print("------------------------------------")
     license_validation = input("SECMON is licensed by CC BY-NC-SA 4.0 license. Do you accept the terms of the license? (y/Y;n/N) : ")
     if license_validation == "y" or license_validation == "Y":
-        mailTester(sender, passwd, server, port, tls, receivers, language)
+        mailTester(smtp_login, smtp_passwd, server, port, tls, sender, receivers, language)
     else:
         print("\nYou must accept the terms of the license to install and use SECMON.")
-        exit()        
+        exit()
 main()

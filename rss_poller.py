@@ -28,7 +28,7 @@ rss_feeds = [
 	'https://us-cert.cisa.gov/ncas/all.xml',
 	'https://www.zataz.com/feed/',
 ]
-sender, receiver, password, smtpsrv, port, tls, keywords = '','','','','','',''
+sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls, keywords = '','','','','','','',''
 script_path = os.path.abspath(__file__)
 dir_path = script_path.replace("rss_poller.py","")
 log_file = dir_path+"logs.txt"
@@ -48,7 +48,7 @@ def parseRSSSource(source):
 		new_source = source.replace("https://","").replace("www.","").split(".")[0]
 	return new_source
 	
-def checkConfig(sender, receiver, password, smtpsrv, port, tls,rss_feeds):	
+def checkConfig(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls,rss_feeds):
 	script_path = os.path.abspath(__file__)
 	dir_path = script_path.replace("rss_poller.py","")
 	con = sqlite3.connect(dir_path+'secmon.db')
@@ -58,12 +58,17 @@ def checkConfig(sender, receiver, password, smtpsrv, port, tls,rss_feeds):
 	for value in db_result_tuple:
 		sender = value
 
-	cur.execute("SELECT password FROM config")
+	cur.execute("SELECT smtp_login FROM config")
+	db_result_tuple = cur.fetchone()
+	for value in db_result_tuple:
+		smtp_login = value
+
+	cur.execute("SELECT smtp_password FROM config")
 	db_result_tuple = cur.fetchone()
 	for value in db_result_tuple:
 		b = value.encode("UTF-8")
 		bytes_password = base64.b64decode(b)
-		password = bytes_password.decode("UTF-8")
+		smtp_password = bytes_password.decode("UTF-8")
 
 	cur.execute("SELECT smtpsrv FROM config")
 	db_result_tuple = cur.fetchone()
@@ -103,13 +108,13 @@ def checkConfig(sender, receiver, password, smtpsrv, port, tls,rss_feeds):
 			keywords.append(result)
 
 
-	if all(value != '' for value in [sender, receivers, password, smtpsrv, str(port), tls, language]):
+	if all(value != '' for value in [sender, receivers, smtp_login, smtp_password, smtpsrv, str(port), tls, language]):
 		print(bcolors.OKGREEN+"Configuration is good."+bcolors.ENDC)
-		rssPoller(sender, receivers, password, smtpsrv, port, tls, language, rss_feeds)
+		rssPoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, language, rss_feeds)
 	else:
 		print(bcolors.FAIL+"Error in the config."+bcolors.ENDC)
 
-def rssPoller(sender, receivers, password, smtpsrv, port, tls, language, rss_feeds):
+def rssPoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, language, rss_feeds):
 	print("------------------------------------")
 	summary, url = "",""
 	new = False
@@ -141,7 +146,7 @@ def rssPoller(sender, receivers, password, smtpsrv, port, tls, language, rss_fee
 				cur.execute("INSERT INTO RSS_DATA (RSS_URL, title, rss_f, summary) VALUES (?,?,?,?);", (url,title,rss_feed,summary))
 				con.commit()
 				try:
-					sendAlert(sender, password, smtpsrv, port, tls, receivers, title, summary, url, language, rss_feed)
+					sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, title, summary, url, language, rss_feed)
 					mail = "sent"
 				except:
 					mail = "unsent"
@@ -155,7 +160,7 @@ def rssPoller(sender, receivers, password, smtpsrv, port, tls, language, rss_fee
 	print(bcolors.OKBLUE+"Finished at : "+timestamp+bcolors.ENDC)
 	print("------------------------------------")
 
-def sendAlert(sender, password, smtpsrv, port, tls, receivers, title, summary, url, language, rss_feed):
+def sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, title, summary, url, language, rss_feed):
 	body = ""
 	for receiver in receivers:
 		with open(dir_path+'rss_template.html', 'r') as template:
@@ -191,11 +196,11 @@ def sendAlert(sender, password, smtpsrv, port, tls, receivers, title, summary, u
 			if tls == "yes":
 				smtpserver.ehlo()
 				smtpserver.starttls()
-				smtpserver.login(sender, password)
+				smtpserver.login(smtp_login, smtp_password)
 				smtpserver.sendmail(sender, receiver, msg.as_string())
 				print(bcolors.HEADER+"News was sent at {}\n".format(receiver)+bcolors.ENDC)
 			elif tls == "no":
-				smtpserver.login(sender, password)
+				smtpserver.login(smtp_login, smtp_password)
 				smtpserver.sendmail(sender, receiver, msg.as_string())
 				print(bcolors.HEADER+"News was sent at {}\n".format(receiver)+bcolors.ENDC)
 		except Exception as e:
@@ -209,7 +214,7 @@ def main():
 	timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 	print(bcolors.OKBLUE+"Starting at : "+timestamp+bcolors.ENDC)
 	print("------------------------------------")
-	checkConfig(sender, receiver, password, smtpsrv, port, tls,rss_feeds)
+	checkConfig(sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls,rss_feeds)
 	
 main()
 

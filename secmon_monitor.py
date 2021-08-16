@@ -36,8 +36,8 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-sender, receiver, password, smtpsrv, port, tls, keywords = '','','','','','',''
-def checkConfig(sender, receiver, password, smtpsrv, port, tls, keywords, dir_path, chk_result):	
+sender, receiver, smtp_login, password, smtpsrv, port, tls, keywords = '','','','','','','',''
+def checkConfig(sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls, keywords, dir_path, chk_result):
 	con = sqlite3.connect(dir_path+'secmon.db')
 	cur = con.cursor()
 	cur.execute("SELECT sender FROM config")
@@ -45,12 +45,17 @@ def checkConfig(sender, receiver, password, smtpsrv, port, tls, keywords, dir_pa
 	for value in db_result_tuple:
 		sender = value
 
-	cur.execute("SELECT password FROM config")
+	cur.execute("SELECT smtp_login FROM config")
+	db_result_tuple = cur.fetchone()
+	for value in db_result_tuple:
+		smtp_login = value
+
+	cur.execute("SELECT smtp_password FROM config")
 	db_result_tuple = cur.fetchone()
 	for value in db_result_tuple:
 		b = value.encode("UTF-8")
 		bytes_password = base64.b64decode(b)
-		password = bytes_password.decode("UTF-8")
+		smtp_password = bytes_password.decode("UTF-8")
 
 	cur.execute("SELECT smtpsrv FROM config")
 	db_result_tuple = cur.fetchone()
@@ -89,7 +94,7 @@ def checkConfig(sender, receiver, password, smtpsrv, port, tls, keywords, dir_pa
 		for result in db_result_tuple:	
 			keywords.append(result)
 	
-	if all(value != '' for value in [sender, receivers, password, smtpsrv, str(port), tls, language]):
+	if all(value != '' for value in [sender, receivers, smtp_login, smtp_password, smtpsrv, str(port), tls, language]):
 		print(bcolors.OKGREEN+"1. Configuration is good."+bcolors.ENDC)
 		chk_result["1"] = "1. Configuration is good."
 	else:
@@ -160,7 +165,7 @@ def main(dir_path):
 	print(bcolors.OKBLUE+" Starting at : "+timestamp+bcolors.ENDC)
 	print("------------------------------------")
 	chk_result = {'1':'','2':'','3':'','4':'','5':'','6':''}
-	checkConfig(sender, receiver, password, smtpsrv, port, tls, keywords, dir_path, chk_result)
+	checkConfig(sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls, keywords, dir_path, chk_result)
 	checkRssFeeds(rss_feeds, dir_path, chk_result)
 	checkFileSize(dir_path, chk_result)
 	print("------------------------------------")

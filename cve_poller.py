@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from secmon_lib import getParsedCpe, translateText, getUserLanguage, getCpeList, pollCveIdFromCpe, writeCveTypeLog, writeMgmtTasksLog
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
-sender, receiver, password, smtpsrv, port, tls, keywords = '','','','','','',''
+sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls, keywords = '','','','','','','',''
 script_path = os.path.abspath(__file__)
 dir_path = script_path.replace("cve_poller.py","")
 log_file = dir_path+"logs.txt"
@@ -33,7 +33,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def checkConfig(sender, receiver, password, smtpsrv, port, tls,keywords):	
+def checkConfig(sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls,keywords):
 	script_path = os.path.abspath(__file__)
 	dir_path = script_path.replace("cve_poller.py","")
 	con = sqlite3.connect(dir_path+'secmon.db')
@@ -43,12 +43,17 @@ def checkConfig(sender, receiver, password, smtpsrv, port, tls,keywords):
 	for value in db_result_tuple:
 		sender = value
 
-	cur.execute("SELECT password FROM config")
+	cur.execute("SELECT smtp_login FROM config")
+	db_result_tuple = cur.fetchone()
+	for value in db_result_tuple:
+		smtp_login = value
+
+	cur.execute("SELECT smtp_password FROM config")
 	db_result_tuple = cur.fetchone()
 	for value in db_result_tuple:
 		b = value.encode("UTF-8")
 		bytes_password = base64.b64decode(b)
-		password = bytes_password.decode("UTF-8")
+		smtp_password = bytes_password.decode("UTF-8")
 
 	cur.execute("SELECT smtpsrv FROM config")
 	db_result_tuple = cur.fetchone()
@@ -87,14 +92,14 @@ def checkConfig(sender, receiver, password, smtpsrv, port, tls,keywords):
 		for result in db_result_tuple:	
 			keywords.append(result)
 
-	if all(value != '' for value in [sender, receivers, password, smtpsrv, str(port), tls, language]):
+	if all(value != '' for value in [sender, receivers, smtp_login, password, smtpsrv, str(port), tls, language]):
 		print(bcolors.OKGREEN+"Configuration is good."+bcolors.ENDC)
-		cvePoller(sender, receivers, password, smtpsrv, port, tls, keywords, language)
+		cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, keywords, language)
 	else:
 		print(bcolors.FAIL+"Error in the config."+bcolors.ENDC)
 		exit()
 
-def cvePoller(sender, receivers, password, smtpsrv, port, tls, keywords, language):
+def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, keywords, language):
 	print("------------------------------------")
 	summary, url = "",""
 	cve_rss = []
@@ -223,7 +228,7 @@ def cvePoller(sender, receivers, password, smtpsrv, port, tls, keywords, languag
 						report="updated"
 						print("New CVE detected -> "+cve_id)
 						try:	
-							sendAlert(sender, password, smtpsrv, port, tls, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
+							sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
 							alert = "sent"
 						except:
 							alert = "unsent"
@@ -344,7 +349,7 @@ def cvePoller(sender, receivers, password, smtpsrv, port, tls, keywords, languag
 						print("New CVE detected -> "+cve_id)
 						report="updated"
 						try:	
-							sendAlert(sender, password, smtpsrv, port, tls, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
+							sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
 							alert = "sent"
 						except:
 							alert = "unsent"
@@ -365,7 +370,7 @@ def cvePoller(sender, receivers, password, smtpsrv, port, tls, keywords, languag
 		print(bcolors.OKBLUE+"Finished at : "+timestamp+bcolors.ENDC)
 		print("------------------------------------")
 
-def sendAlert(sender, password, smtpsrv, port, tls, receivers, cve_id, cve_sources, cve_score, cve_status, cve_cpe, cve_date, cve_description, language,key_match):
+def sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, cve_id, cve_sources, cve_score, cve_status, cve_cpe, cve_date, cve_description, language,key_match):
 	body = ""
 	nvd_url = "https://nvd.nist.gov/vuln/detail/"+cve_id
 	for receiver in receivers:
@@ -425,11 +430,11 @@ def sendAlert(sender, password, smtpsrv, port, tls, receivers, cve_id, cve_sourc
 			if tls == "yes":
 				smtpserver.ehlo()
 				smtpserver.starttls()
-				smtpserver.login(sender, password)
+				smtpserver.login(smtp_login, password)
 				smtpserver.sendmail(sender, receiver, msg.as_string())
 				print(bcolors.HEADER+"Alert was sent at {}\n".format(receiver)+bcolors.ENDC)
 			elif tls == "no":
-				smtpserver.login(sender, password)
+				smtpserver.login(smtp_login, password)
 				smtpserver.sendmail(sender, receiver, msg.as_string())
 				print(bcolors.HEADER+"Alert was sent at {}\n".format(receiver)+bcolors.ENDC)
 		except Exception as e:
@@ -442,7 +447,7 @@ def main():
 	timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 	print(bcolors.OKBLUE+"Starting at : "+timestamp+bcolors.ENDC)
 	print("------------------------------------")
-	checkConfig(sender, receiver, password, smtpsrv, port, tls, keywords)
+	checkConfig(sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls,keywords)
 	
 main()
 
