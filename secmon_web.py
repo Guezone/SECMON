@@ -336,7 +336,7 @@ def getLowCVE():
 		current_cve.pop(0)
 		if current_cve[3] != "N/A":
 			current_cve[3] = current_cve[3].split(" ")[0]
-			if 0 < float(current_cve[3]) <= 3.9:
+			if 0 <= float(current_cve[3]) <= 3.9:
 				low_cve_id.append(current_cve[0])
 				count +=1
 
@@ -374,7 +374,7 @@ def getMediumCVE():
 		current_cve.pop(0)
 		if current_cve[3] != "N/A":
 			current_cve[3] = current_cve[3].split(" ")[0]
-			if 4.0 < float(current_cve[3]) <= 6.9:
+			if 4.0 <= float(current_cve[3]) <= 6.9:
 				medium_cve_id.append(current_cve[0])
 				count +=1
 
@@ -411,7 +411,7 @@ def getHighCVE():
 		current_cve.pop(0)
 		if current_cve[3] != "N/A":
 			current_cve[3] = current_cve[3].split(" ")[0]
-			if 7.0 < float(current_cve[3]) <= 8.9:
+			if 7.0 <= float(current_cve[3]) <= 8.9:
 				high_cve_id.append(current_cve[0])
 				count +=1
 
@@ -448,7 +448,7 @@ def getCriticalCVE():
 		current_cve.pop(0)
 		if current_cve[3] != "N/A":
 			current_cve[3] = current_cve[3].split(" ")[0]
-			if 9.0 < float(current_cve[3]) <= 10:
+			if 9.0 <= float(current_cve[3]) <= 10:
 				critical_cve_id.append(current_cve[0])
 				count +=1
 

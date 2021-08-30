@@ -194,13 +194,13 @@ def generateCveReport(start_date,end_date,isFull):
 def writeCveTypeLog(source_script,cve_id,temporal_type,matched_product,cvss_score,cve_date,cpes,report,alert,*args):
 	server = socket.gethostbyname(socket.gethostname())
 	if cvss_score != "N/A" and cvss_score != "":
-		if 0 < float(cvss_score) <= 3.9:
+		if 0 <= float(cvss_score) <= 3.9:
 			severity = "Low"
-		elif 4.0 < float(cvss_score) <= 6.9:
+		elif 4.0 <= float(cvss_score) <= 6.9:
 			severity = "Medium"
-		elif 7.0 < float(cvss_score) <= 8.9:
+		elif 7.0 <= float(cvss_score) <= 8.9:
 			severity = "High"
-		elif 9.0 < float(cvss_score) <= 10:
+		elif 9.0 <= float(cvss_score) <= 10:
 			severity = "Critical"
 		elif cvss_score == "N/A":
 			severity = "N/A"
@@ -759,13 +759,13 @@ def getCveByProduct(product,sleeping):
 				current_cve.append(result)
 			if current_cve[1] != None and current_cve[1] != "N/A" :
 				current_cve[1] = current_cve[1].split(" ")[0]
-				if 0 < float(current_cve[1]) <= 3.9:
+				if 0 <= float(current_cve[1]) <= 3.9:
 					low_cve.append(current_cve)
-				elif 4.0 < float(current_cve[1]) <= 6.9:
+				elif 4.0 <= float(current_cve[1]) <= 6.9:
 					medium_cve.append(current_cve)
-				elif 7.0 < float(current_cve[1]) <= 8.9:
+				elif 7.0 <= float(current_cve[1]) <= 8.9:
 					high_cve.append(current_cve)
-				elif 9.0 < float(current_cve[1]) <= 10:
+				elif 9.0 <= float(current_cve[1]) <= 10:
 					critical_cve.append(current_cve)
 			elif current_cve[1] == "N/A":
 				na_cve.append(current_cve)
@@ -1345,13 +1345,13 @@ def getRegisteredCveStats():
 		current_cve.pop(0)
 		if current_cve[3] != "N/A" and current_cve[3] != None:
 			current_cve[3] = current_cve[3].split(" ")[0]
-			if 0 < float(current_cve[3]) <= 3.9:
+			if 0 <= float(current_cve[3]) <= 3.9:
 				low_counter +=1
-			elif 4.0 < float(current_cve[3]) <= 6.9:
+			elif 4.0 <= float(current_cve[3]) <= 6.9:
 				medium_counter +=1
-			elif 7.0 < float(current_cve[3]) <= 8.9:
+			elif 7.0 <= float(current_cve[3]) <= 8.9:
 				high_counter +=1
-			elif 9.0 < float(current_cve[3]) <= 10:
+			elif 9.0 <= float(current_cve[3]) <= 10:
 				critical_counter +=1
 	stats = [low_counter,medium_counter,high_counter,critical_counter]
 	return stats
@@ -1449,16 +1449,16 @@ def getRegisteredCve():
 
 		if current_cve[3] != "N/A":
 			current_cve[3] = current_cve[3].split(" ")[0]
-			if 0 < float(current_cve[3]) <= 3.9:
+			if 0 <= float(current_cve[3]) <= 3.9:
 				current_cve.append("#36b9cc")
 				current_cve.append("white")
-			elif 3.9 < float(current_cve[3]) <= 6.9:
+			elif 3.9 <= float(current_cve[3]) <= 6.9:
 				current_cve.append("#faaa3c")
 				current_cve.append("black")
-			elif 6.9 < float(current_cve[3]) <= 8.9:
+			elif 6.9 <= float(current_cve[3]) <= 8.9:
 				current_cve.append("#e74a3b")
 				current_cve.append("white")
-			elif 8.9 < float(current_cve[3]) <= 10:
+			elif 8.9 <= float(current_cve[3]) <= 10:
 				current_cve.append("#202020")
 				current_cve.append("white")
 		else:
