@@ -92,7 +92,7 @@ def checkConfig(sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls,
 		for result in db_result_tuple:	
 			keywords.append(result)
 
-	if all(value != '' for value in [sender, receivers, smtp_login, password, smtpsrv, str(port), tls, language]):
+	if all(value != '' for value in [sender, receivers, smtp_login, smtp_password, smtpsrv, str(port), tls, language]):
 		print(bcolors.OKGREEN+"Configuration is good."+bcolors.ENDC)
 		cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, keywords, language)
 	else:

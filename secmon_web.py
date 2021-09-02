@@ -220,7 +220,10 @@ def cveAlerts():
 					it.append(infos['cve_date'])
 					it.append(infos['cve_score'])
 					it.append(infos['cve_status'])
-					it.append(infos['cve_cpe'])
+					if "N/A" in infos['cve_cpe']:
+						it.append([infos['cve_keymatch']])
+					else:
+						it.append(infos['cve_cpe'])
 					it.append(infos['cve_sources'])
 					it.append(infos['cve_mgmt_status'])
 				else:
