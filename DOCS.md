@@ -328,6 +328,7 @@ You must then delete the Apache sites configured by default :
 sudo rm /etc/apache2/sites-enabled/*
 sudo rm /etc/apache2/sites-available/*
 sudo a2enmod wsgi
+sudo a2enmod ssl
 ```
 Then, you have to create a new configuration file dedicated to SECMON (in ```/etc/apache2/sites-available/secmon.conf```) : 
 
