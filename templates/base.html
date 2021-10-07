@@ -54,7 +54,7 @@ a {color:#6e6e6e;}
       <!-- Sidebar - Brand -->
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
         <div class="sidebar-brand-icon">
-          <img src="{{ url_for('static', filename='img/logo.png') }}" style="height: 45px;width: 45px;margin-left: 5px;">
+          <img src=""{% if back %}{{back}}{% endif %}img/logo.png"" style="height: 45px;width: 45px;margin-left: 5px;">
         </div>
         <div class="sidebar-brand-text mx-3" style="font-family: 'Permanent Marker';font-size: 2rem;margin-left: 0.5rem !important;">SECMON</div>
       </a>
