@@ -182,7 +182,7 @@ cd SECMON
 sudo pip3 install -r requirements.txt
 sudo rm -Rf /var/www/html
 sudo mkdir /var/www/secmon && sudo cp -r * /var/www/secmon/ && cd /var/www/secmon/
-sudo python3 setup.py -sender sender@mail.com -p 'XXXXXXXXXXXXXXXX' -server srv.mail.com -port 587 -tls yes -lang fr -r 'receiver1@mail.com;receiver2@mail.com'
+sudo python3 setup.py -sender sender@mail.com -p 'XXXXXXXXXXXXXXXX' -login [your SMTP login, often email address] -server srv.mail.com -port 587 -tls yes -lang fr -r 'receiver1@mail.com;receiver2@mail.com'
 ```
 **Note :** The installation script may take a few minutes or even a few hours. You can also add your product list after install and press "n" on the two instructions.
 
@@ -328,6 +328,7 @@ You must then delete the Apache sites configured by default :
 sudo rm /etc/apache2/sites-enabled/*
 sudo rm /etc/apache2/sites-available/*
 sudo a2enmod wsgi
+sudo a2enmod ssl
 ```
 Then, you have to create a new configuration file dedicated to SECMON (in ```/etc/apache2/sites-available/secmon.conf```) : 
 
