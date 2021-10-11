@@ -4,19 +4,21 @@
     <h1 class="h3 mb-0 text-gray-800">Cyber threats</h1><hr>
     <div class="card shadow mb-4">
         <div class="card-body">
-            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Top Cyber Subject</h4>
+            <h4 class="card-title mb-5"><i class="fa fa-chevron-right fa-fw" style="color:#faaa3c;"></i> Top Cyber Threats</h4>
 
              <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0" id="dataTables-example" style="vertical-align: middle!important;">
                         <thead style="vertical-align: middle!important;">
                             <tr style="vertical-align: middle!important;">
-                                <th style="vertical-align: middle!important;text-align: center;">Word</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Category</th>
+                                <th style="vertical-align: middle!important;text-align: center;">Threat</th>
                             </tr>
                         </thead>
                         <tbody style="vertical-align: middle!important;">
-                            {% for word in words %}
+                            {% for t in words %}
                                 <tr style="vertical-align: middle!important;">
-                                    <td style="vertical-align: middle!important;text-align: center;"> {{ word }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ t[0] }}</td>
+                                    <td style="vertical-align: middle!important;text-align: center;"> {{ t[1] }}</td>
                                 </tr style="vertical-align: middle!important;">
                             {% endfor %}
                         </tbody>

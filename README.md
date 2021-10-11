@@ -41,6 +41,7 @@ SECMON requires registration on Github API for exploits retrieval. It also requi
 
 - OS : Linux-based system (tested on Debian 10)
 - Environnement : Python 3 (tested on Python 3.9 and Python 3.8)
+- A valid Github API key
 
 **WARNING** : Web UI credentials are hashed (SHA512 with salt), on the other hand, the Github API connection credentials and the application session key are neither encrypted nor hashed. All data is stored in an unencrypted sqlite database. A few advices :
 

@@ -12,3 +12,4 @@ feedparser==5.2.1
 beautifulsoup4==4.9.3
 flask_simplelogin==0.0.7
 python-dateutil
+PyGithub

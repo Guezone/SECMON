@@ -12,7 +12,7 @@ __email__ = "custodio.aubin@outlook.com"
 from flask import Flask, url_for, render_template, send_from_directory, request, flash, redirect, safe_join, session, url_for, session, abort
 import jinja2.exceptions, sqlite3,requests, feedparser, re, os, random
 from datetime import datetime, timedelta
-from secmon_lib import getNewsTopSubject,getExploitableCveIdList,writeAuthLog,generateCveReport,getProductInfos,getParsedCpe,getRegisteredCveStatus, getTasks, getHighRiskProducts, getProductsStats, getCveByProduct,getRegisteredCve, getRegisteredCveStats,getFormatedProductList, getUnregisteredCveInfos, getRegisteredCveInfos, rss_feeds, get_db_connection, removeHTMLtags, changeCVEState,searchExploit, returnUsername, getSecretKey, messages, addProduct, deleteProduct,showProducts, mailTester
+from secmon_lib import getTopThreats,getExploitableCveIdList,writeAuthLog,generateCveReport,getProductInfos,getParsedCpe,getRegisteredCveStatus, getTasks, getHighRiskProducts, getProductsStats, getCveByProduct,getRegisteredCve, getRegisteredCveStats,getFormatedProductList, getUnregisteredCveInfos, getRegisteredCveInfos, rss_feeds, get_db_connection, removeHTMLtags, changeCVEState,searchExploit, returnUsername, getSecretKey, messages, addProduct, deleteProduct,showProducts, mailTester
 import secmon_monitor
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import HTTPException
@@ -240,7 +240,7 @@ def cveAlerts():
 @app.route('/cyber-threats')
 @login_required
 def topCyberSubject():
-	words = getNewsTopSubject()
+	words = getTopThreats()
 	return render_template('cyber-threats.html',words=words)
 @app.route('/cve-updates')
 @login_required

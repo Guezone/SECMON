@@ -210,20 +210,17 @@ def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver,
     else:
         print("\nPlease choose if you want to use CPE or not... Exiting.")
         exit()  
-    github_api_choice = input("Do you want to use a Github API for exploit retrieval (y/Y;n/N) : ")
-    print()
-    if github_api_choice == "y" or github_api_choice == "Y":
-        github_username = input("Please enter your Github username : ")
-        github_api_key = input("Please enter your Github API Token : ")
-        try:
-            login_attempt = requests.get('https://api.github.com/search/repositories?q=github+api', auth=(github_username,github_api_key))
-            if login_attempt.status_code != 200:
-                raise
-            else:
-                con.execute("INSERT INTO config (github_api_key,github_username,cvss_alert_limit,no_score_cve_alert) VALUES (?,?,?,?);", (github_username,github_api_key,"no_limit","True"))
-                con.commit()
-        except:
-            print("Github API authentication failed. You can add this config on the web UI after installation...")
+    github_username = input("Please enter your Github username : ")
+    github_api_key = input("Please enter your Github API Token : ")
+    try:
+        login_attempt = requests.get('https://api.github.com/search/repositories?q=github+api', auth=(github_username,github_api_key))
+        if login_attempt.status_code != 200:
+            raise
+        else:
+            con.execute("INSERT INTO config (github_api_key,github_username,cvss_alert_limit,no_score_cve_alert) VALUES (?,?,?,?);", (github_username,github_api_key,"no_limit","True"))
+            con.commit()
+    except:
+        print("Github API authentication failed. You can add this config on the web UI after installation...")
     else:
         con.execute("INSERT INTO config (github_api_key,github_username,cvss_alert_limit,no_score_cve_alert) VALUES (?,?,?,?);", ("None","None","no_limit","True"))
         con.commit()       

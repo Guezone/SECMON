@@ -29,6 +29,7 @@ import cve_searchsploit as CS
 import secmon_monitor,traceback
 from multiprocessing import Process, Queue
 from datetime import *
+from github import Github
 rss_feeds = [ 
 	'https://cyware.com/allnews/feed',
 	'https://www.cshub.com/rss/categories/attacks',
@@ -53,6 +54,21 @@ messages = {
 def sortWordsByOccurrences(word_stats):
 	word_stats.sort(key = lambda x: x[1])
 	return word_stats[::-1]
+def getTopThreats():
+	git_key,git_username = getGithubAPISettings()
+	git_access = Github(git_key)
+	mcafee_repo = git_access.get_repo("advanced-threat-research/Yara-Rules")
+	contents = mcafee_repo.get_contents("")
+	yara_list =  []
+	while contents:
+		file_content = contents.pop(0)
+		if file_content.type == "dir":
+			contents.extend(mcafee_repo.get_contents(file_content.path))
+		else:
+			if ".yar" in str(file_content) and not "Eicar" in str(file_content):
+				threat = str(file_content).replace('ContentFile(path="',"").replace('.yar")',"").split("/")[0],str(file_content).replace('ContentFile(path="',"").replace('.yar")',"").split("/")[1].split("_",1)[1]
+				yara_list.append([threat[0].title().replace("_","").replace("Apt","APT"),threat[1].title().replace("_","")])
+	return yara_list
 
 def getNewsTopSubject():
 	top_words = []
