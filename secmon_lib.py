@@ -30,6 +30,7 @@ import secmon_monitor,traceback
 from multiprocessing import Process, Queue
 from datetime import *
 from github import Github
+from traceback_with_variables import print_exc
 rss_feeds = [ 
 	'https://cyware.com/allnews/feed',
 	'https://www.cshub.com/rss/categories/attacks',
@@ -108,7 +109,7 @@ def handleException(error):
 	now = datetime.now()
 	now = now.strftime("%d/%m/%Y, %H:%M:%S")
 	print(f"################## NEW SCRIPT ERROR AT {now} ##################")
-	print(traceback.print_exc())
+	print(print_exc())
 	print("################## PLEASE REPORT THIS ON GITHUB ##################")
 def generateCveReport(start_date,end_date,isFull):
 	bold_font = Font(bold=True,color='00FAAA3C', size=14)

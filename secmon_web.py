@@ -22,6 +22,7 @@ from flask_simplelogin import is_logged_in
 from multiprocessing import Process
 import traceback, os.path
 import urllib.parse
+from traceback_with_variables import print_exc
 def secmon_auth(user):
     script_path = os.path.abspath(__file__)
     dir_path = script_path.replace("secmon_web.py","")
@@ -737,7 +738,7 @@ def handle_exception(error):
 	now = now.strftime("%d/%m/%Y, %H:%M:%S")
 	print(f"################## NEW GUI ERROR AT {now} ##################")
 	print(f"######## URL : {request.base_url} ##########")
-	print(traceback.print_exc())
+	print(print_exc())
 	print("################## PLEASE REPORT THIS ON GITHUB ##################")
 	return render_template("errors.html"), 200
 if __name__ == '__main__':
