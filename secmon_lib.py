@@ -560,7 +560,7 @@ def deleteProduct(ptype, key_or_cpe):
 			return "NOK"
 
 def registerNewCve(cve_id,reason,product):
-	time.sleep(5)
+	sleep(5)
 	try:
 		now_date = str(datetime.now()).split(" ")[0].split("-")
 		idx_date = now_date[2]+"/"+now_date[1]+"/"+now_date[0]
@@ -662,7 +662,7 @@ def registerNewCve(cve_id,reason,product):
 		print("ERROR when SECMON would to register this CVE : ",cve_id)
 		handleException(e)
 def addProduct(ptype, key_or_cpe):
-	time.sleep(10)
+	sleep(10)
 	task_id = random.randint(10000,99999)
 	writeTaskLog("secmon_web",task_id,"loaded",f"Adding the following product : {key_or_cpe}....")
 	if ptype == "CPE":

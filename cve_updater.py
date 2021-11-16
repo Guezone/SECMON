@@ -11,7 +11,7 @@ __maintainer__ = "Aubin Custodio"
 __email__ = "custodio.aubin@outlook.com"
 from secmon_lib import writeNewExploitFoundLog, getUnexploitableCveIdList,getGithubAPISettings,getRegisteredCveInfos, get_db_connection, getUnregisteredCveInfos, getFormatedProductList, getCveByProduct, writeNewHighRiskProductLog, writeCveTypeLog
 from datetime import datetime
-import os,requests
+import os,requests,time
 import cve_searchsploit as CS
 script_path = os.path.abspath(__file__)
 dir_path = script_path.replace("cve_updater.py","")
