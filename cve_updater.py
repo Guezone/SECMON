@@ -40,6 +40,7 @@ if user == "None" or key == "None":
 	print("No Github API configuration found.")
 else:
 	for cve in cve_list:
+		time.sleep(30)
 		github_query = "https://api.github.com/search/repositories?q=exploit+"+cve
 		github_response = requests.get(url=github_query,auth=(user,key))
 		github_data = github_response.json()
@@ -87,6 +88,7 @@ for cve in indb_cve_list:
 	try:
 		try:
 			before_update = getRegisteredCveInfos(cve, full=True)
+			time.sleep(5)
 			after_update = getUnregisteredCveInfos(cve)
 		except:
 			continue

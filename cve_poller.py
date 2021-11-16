@@ -116,6 +116,7 @@ def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 	dest_language = getUserLanguage()
 	now_date = str(datetime.now()).split(" ")[0].split("-")
 	idx_date = now_date[2]+"/"+now_date[1]+"/"+now_date[0]
+	time.sleep(10)
 
 
 	# CPE
@@ -126,6 +127,7 @@ def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 	if cpes != []:
 		print(bcolors.HEADER+"Polling NVD related to your product list (CPE based search)."+bcolors.ENDC+"\n")
 		for cpe in cpes:
+			time.sleep(30)
 			cve_ids = pollCveIdFromCpe(cpe)
 			cpe = cpe.replace("\n","").replace(" ","")
 			for cve_id in cve_ids:
@@ -136,6 +138,7 @@ def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 					for result in db_result_tuple:
 						db_result_str+=result
 				if cve_id not in db_result_str:
+					time.sleep(10)
 					nvd_base_url = "https://services.nvd.nist.gov/rest/json/cve/1.0/"
 					nvd_query = nvd_base_url+cve_id
 					nvd_response = requests.get(url=nvd_query)
@@ -258,6 +261,7 @@ def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 					for result in db_result_tuple:	
 						db_result_str+=result
 				if cve_id not in db_result_str:
+					time.sleep(15)
 					nvd_base_url = "https://services.nvd.nist.gov/rest/json/cve/1.0/"
 					nvd_query = nvd_base_url+cve_id
 					nvd_response = requests.get(url=nvd_query)
