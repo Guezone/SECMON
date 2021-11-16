@@ -151,6 +151,7 @@ def buildCVEList(language):
     if cpes != []:
         for cpe in cpes:
             try:
+                time.sleep(20)
                 cve_ids = pollCveIdFromCpe(cpe)
             except:
                 print("Unable to find CVE related to this product : "+cpe)
@@ -223,7 +224,7 @@ def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver,
         print("Github API authentication failed. You can add this config on the web UI after installation...")
     else:
         con.execute("INSERT INTO config (github_api_key,github_username,cvss_alert_limit,no_score_cve_alert) VALUES (?,?,?,?);", ("None","None","no_limit","True"))
-        con.commit()       
+        con.commit()
     print()
     username = ""
     password = ""
