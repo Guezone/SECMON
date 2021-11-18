@@ -16,7 +16,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
-from secmon_lib import getParsedCpe, translateText, getUserLanguage, getCpeList, pollCveIdFromCpe, writeCveTypeLog, writeMgmtTasksLog
+from secmon_lib import getParsedCpe, translateText, getUserLanguage, getCpeList, pollCveIdFromCpe, writeCveTypeLog, writeMgmtTasksLog,handleException
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 sender, receiver, smtp_login, smtp_password, smtpsrv, port, tls, keywords = '','','','','','','',''
 script_path = os.path.abspath(__file__)
@@ -233,7 +233,8 @@ def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 						try:	
 							sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
 							alert = "sent"
-						except:
+						except Exception as e:
+							handleException(e)
 							alert = "unsent"
 						new_cve_list.append(cve_id)
 						writeCveTypeLog("cve_poller",cve_id,"new",key_match,str(cve_score).split(" ")[0],cve_date,cve_cpe,report,alert)
@@ -355,7 +356,8 @@ def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 						try:	
 							sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
 							alert = "sent"
-						except:
+						except Exception as e:
+							handleException(e)
 							alert = "unsent"
 						new_cve_list.append(cve_id)
 						writeCveTypeLog("cve_poller",cve_id,"new",key_match,str(cve_score).split(" ")[0],cve_date,cve_cpe,report,alert)
@@ -427,7 +429,8 @@ def sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, 
 			msg['From'] = sender
 			msg['To'] = receiver
 			msg.attach(MIMEText(body, 'html'))
-		except:
+		except Exception as e:
+			handleException(e)
 			print(bcolors.FAIL+"Failed to send alert at {}.".format(receiver)+bcolors.ENDC)
 			exit()
 		try:
@@ -442,6 +445,7 @@ def sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, 
 				smtpserver.sendmail(sender, receiver, msg.as_string())
 				print(bcolors.HEADER+"Alert was sent at {}\n".format(receiver)+bcolors.ENDC)
 		except Exception as e:
+			handleException(e)
 			print(bcolors.FAIL+"An error occurred during authentication with the SMTP server. Check the configuration and try again."+bcolors.ENDC)
 			exit()
 

@@ -14,7 +14,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from datetime import datetime, timedelta
-from secmon_lib import translateText, getUserLanguage, writeMgmtTasksLog, writeNewRssNewLog
+from secmon_lib import translateText, getUserLanguage, writeMgmtTasksLog, writeNewRssNewLog,handleException
 rss_feeds = [ 
 	'https://cyware.com/allnews/feed',
 	'https://www.cshub.com/rss/categories/attacks',
@@ -148,7 +148,8 @@ def rssPoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 				try:
 					sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, title, summary, url, language, rss_feed)
 					mail = "sent"
-				except:
+				except Exception as e:
+					handleException(e)
 					mail = "unsent"
 				writeNewRssNewLog("rss_poller",parseRSSSource(rss_feed),rss_feed,title,url,mail)
 	if new == True:
@@ -189,7 +190,8 @@ def sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, 
 			msg['From'] = sender
 			msg['To'] = receiver
 			msg.attach(MIMEText(body, 'html'))
-		except:
+		except Exception as e:
+			handleException(e)
 			print(bcolors.FAIL+"Failed to send news at {}.".format(receiver)+bcolors.ENDC)
 			exit()
 		try:
@@ -204,6 +206,7 @@ def sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, 
 				smtpserver.sendmail(sender, receiver, msg.as_string())
 				print(bcolors.HEADER+"News was sent at {}\n".format(receiver)+bcolors.ENDC)
 		except Exception as e:
+			handleException(e)
 			print(bcolors.FAIL+"An error occurred during authentication with the SMTP server. Check the configuration and try again."+bcolors.ENDC)
 			exit()
 
