@@ -437,11 +437,11 @@ def sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, 
 			if tls == "yes":
 				smtpserver.ehlo()
 				smtpserver.starttls()
-				smtpserver.login(smtp_login, password)
+				smtpserver.login(smtp_login, smtp_password)
 				smtpserver.sendmail(sender, receiver, msg.as_string())
 				print(bcolors.HEADER+"Alert was sent at {}\n".format(receiver)+bcolors.ENDC)
 			elif tls == "no":
-				smtpserver.login(smtp_login, password)
+				smtpserver.login(smtp_login, smtp_password)
 				smtpserver.sendmail(sender, receiver, msg.as_string())
 				print(bcolors.HEADER+"Alert was sent at {}\n".format(receiver)+bcolors.ENDC)
 		except Exception as e:
