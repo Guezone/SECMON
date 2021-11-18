@@ -157,7 +157,7 @@ You can now access the web interface at the following address: https://secmon.de
 Edit the **host crontab** with **vi /etc/crontab** command, for example like this :
 
 ```bash
-*/20 * * * * root docker exec secmon-srv python3 /var/www/secmon/secmon.py >> /var/log/secmon 2>&1
+0 * * * * root docker exec secmon-srv python3 /var/www/secmon/secmon.py >> /var/log/secmon 2>&1
 0 6 * * * root docker exec secmon-srv python3 /var/www/secmon/cve_updater.py >> /var/log/secmon-updates 2>&1
 @reboot root docker start secmon-srv
 @reboot root docker exec secmon-srv service apache2 start
@@ -232,7 +232,7 @@ Edit your crontab with **sudo vi /etc/crontab** command, for example like this :
 
 ```bash
 
-*/20 * * * * root python3 /var/www/secmon/secmon.py >> /var/log/secmon 2>&1
+0 * * * * root python3 /var/www/secmon/secmon.py >> /var/log/secmon 2>&1
 0 6 * * * root python3 /var/www/secmon/cve_updater.py >> /var/log/secmon-updates 2>&1
 
 ```
