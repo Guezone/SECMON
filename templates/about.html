@@ -14,7 +14,7 @@
     	<div class="card-body">
 			
 			<center><br><a href="/"><img src="{% if back %}{{back}}{% endif %}{{ url_for('static', filename='img/logo.png') }}" alt="unavailable" class="navbar-logo" style="height: 120px;width: 120px;"/></a><br><br><br></center>
-			Version :<b> 2.1</b><br><br>
+			Version :<b> {{version}}</b><br><br>
 			<b>SECMON</b> is a real-time infosec monitoring tool that works from several sources. <br><br><br>
 
 			It works with pollers that allow you to send emails with the latest <b>CVE concerning your IT infrastructure</b> as well as the latest cyber security <b>information published on the web.</b> <br><br><br>

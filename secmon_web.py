@@ -614,7 +614,7 @@ def byProductVulns():
 @app.route('/about')
 @login_required
 def about():
-	return render_template('about.html')
+	return render_template('about.html',version=__version__)
 @app.route('/tasks')
 @login_required
 def tasks():
