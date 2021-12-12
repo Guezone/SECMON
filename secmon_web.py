@@ -275,6 +275,7 @@ def search():
 	if request.method == 'POST':
 		if request.form['cve'] != "" and request.form['cve'] != " ":
 			try:	
+				weakness_nb = ""
 				cve = request.form['cve'].upper()
 				infos = getUnregisteredCveInfos(cve)
 				if infos['cve_weakness'] != "N/A":
