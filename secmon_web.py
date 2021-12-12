@@ -258,7 +258,7 @@ def cveUpdates():
 				it = []
 				cve_id = re.findall('CVE-\d{4}-\d{4,7}',line)[0]
 				it.append(cve_id)
-				it.append(line.split('"')[23].replace('message="',"").replace('"'," "))
+				it.append(line.split('"')[23].replace('message="',"").replace('"'," ").replace(f"The {cve_id} has been updated.",""))
 				cves.append(it)
 				count+=1
 				if count >= 20:
