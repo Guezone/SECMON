@@ -117,6 +117,7 @@ This license allows you to **use** SECMON, to **improve it** and to make it live
 
 # Roadmap
 
+## Features
 - [x] Automate the deployment with docker
 - [x] First security auditing (front-end only)
 - [x] Write the logs in a standard format and plan to send them to a third party of SIEM type.
@@ -125,4 +126,10 @@ This license allows you to **use** SECMON, to **improve it** and to make it live
 - [ ] Add new sources of cyber-news
 - [ ] Create a REST API for calling in other applications
 - [ ] Send CVE daily update report (new high risk product, CVSS changes, affected product changes, new exploitable CVE)
-- [ ] Add a LDAP(S) authentication support
+- [ ] SECMON-Open-API (free and open API to get 0-day, viral vulns & data breach news)
+- [ ] Others Vuln Database polling
+
+## Reliability improvement
+- [X] NIST API rate complete management (partial correction)
+- [ ] Product unification (product = CPE + Keyword)
+- [ ] Keyword management to be case unsensitive
