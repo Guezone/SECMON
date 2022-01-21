@@ -491,7 +491,7 @@ def config():
 			smtpsrv = request.form['server']
 			port = request.form['port']
 			receivers = request.form['recipients']
-			if password != password2:
+			if smtp_password != password2:
 				flash("The two passwords do not match. ","danger")
 				return render_template('config.html')
 			try:
