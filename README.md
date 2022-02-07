@@ -132,4 +132,4 @@ This license allows you to **use** SECMON, to **improve it** and to make it live
 ## Reliability improvement
 - [X] NIST API rate complete management (partial correction)
 - [ ] Product unification (product = CPE + Keyword)
-- [ ] Keyword management to be case unsensitive
+- [X] Keyword management to be case unsensitive

@@ -253,7 +253,7 @@ def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 		cve_id = cve.split("(=)")[0]
 		summary = cve.split("(=)")[1]
 		for key in keywords:
-			if key in summary: 
+			if bool(re.search(key,summary,re.IGNORECASE)) == True:
 				key_match = key
 				cur.execute("SELECT CVE_ID FROM CVE_DATA WHERE CVE_ID = (?);", (cve_id,))
 				db_result_list = cur.fetchall()

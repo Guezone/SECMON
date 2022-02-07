@@ -141,7 +141,7 @@ def buildCVEList(language):
             cve_summary = cve.split("(=)")[1]
             cve_id = cve.split("(=)")[0]
             for key in keywords:
-                if key in cve_summary:
+                if bool(re.search(key,cve_summary,re.IGNORECASE)) == True:
                    registerNewCve(cve_id,"Setup",key) 
         except:
             continue
@@ -269,7 +269,7 @@ def main():
     receivers = ''.join(args.r)
     language = ''.join(args.lang)
     print("------------------------------------")
-    print("SECMON setup script - Version 1.0.0")
+    print(f"SECMON setup script - Version {{__version__}}")
     print("------------------------------------")
     license_validation = input("SECMON is licensed by CC BY-NC-SA 4.0 license. Do you accept the terms of the license? (y/Y;n/N) : ")
     if license_validation == "y" or license_validation == "Y":
