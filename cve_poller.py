@@ -253,114 +253,224 @@ def cvePoller(sender, receivers, smtp_login, smtp_password, smtpsrv, port, tls, 
 		cve_id = cve.split("(=)")[0]
 		summary = cve.split("(=)")[1]
 		for key in keywords:
-			if bool(re.search(key,summary,re.IGNORECASE)) == True:
-				key_match = key
-				cur.execute("SELECT CVE_ID FROM CVE_DATA WHERE CVE_ID = (?);", (cve_id,))
-				db_result_list = cur.fetchall()
-				db_result_str = ""
-				for db_result_tuple in db_result_list:
-					for result in db_result_tuple:	
-						db_result_str+=result
-				if cve_id not in db_result_str:
-					time.sleep(15)
-					nvd_base_url = "https://services.nvd.nist.gov/rest/json/cve/1.0/"
-					nvd_query = nvd_base_url+cve_id
-					nvd_response = requests.get(url=nvd_query)
-					nvd_data = nvd_response.json()
-					if 'result' in nvd_data.keys():
-						if 'reference_data' in nvd_data['result']['CVE_Items'][0]['cve']['references']:
-							nvd_links = nvd_data['result']['CVE_Items'][0]['cve']['references']['reference_data']
-							cve_sources = ""
-							for link in nvd_links:
-								cve_sources += (link['url']+"\n")
-						else:
-								cve_sources = "N/A"
-						cve_score = ""
-						fr_society = " (constructeur/éditeur)"
-						en_society = " (builder/publisher)"
-						if not "impact" in nvd_data['result']['CVE_Items'][0].keys():
-							cve_score = "N/A"
-							try:	
-								webpage = requests.get("https://nvd.nist.gov/vuln/detail/{}".format(cve_id))
-								soup = BeautifulSoup(webpage.content, 'html.parser')
-								cve_cna_score = soup.find(id='Cvss3CnaCalculatorAnchor')
-								cve_cna_score = cve_cna_score.get_text()
-								if cve_cna_score != "":
-									if language == "fr" or language=="FR":
-										cve_score = cve_cna_score + fr_society
-									else:
-										cve_score = cve_cna_score + en_society
-								else:
-									cve_score = "N/A"
-							except:
-									cve_score = "N/A"
-						else:
-							try:
-								cve_score = nvd_data['result']['CVE_Items'][0]['impact']['baseMetricV3']['cvssV3']['baseScore']
-							except:
+			if bool(re.fullmatch(r'[A-Z0-9-._]{4,}',key)) == True or bool(re.fullmatch(r'\w{1,3}',key)) == True:
+				if key in summary:
+					key_match = key
+					cur.execute("SELECT CVE_ID FROM CVE_DATA WHERE CVE_ID = (?);", (cve_id,))
+					db_result_list = cur.fetchall()
+					db_result_str = ""
+					for db_result_tuple in db_result_list:
+						for result in db_result_tuple:	
+							db_result_str+=result
+					if cve_id not in db_result_str:
+						time.sleep(15)
+						nvd_base_url = "https://services.nvd.nist.gov/rest/json/cve/1.0/"
+						nvd_query = nvd_base_url+cve_id
+						nvd_response = requests.get(url=nvd_query)
+						nvd_data = nvd_response.json()
+						if 'result' in nvd_data.keys():
+							if 'reference_data' in nvd_data['result']['CVE_Items'][0]['cve']['references']:
+								nvd_links = nvd_data['result']['CVE_Items'][0]['cve']['references']['reference_data']
+								cve_sources = ""
+								for link in nvd_links:
+									cve_sources += (link['url']+"\n")
+							else:
+									cve_sources = "N/A"
+							cve_score = ""
+							fr_society = " (constructeur/éditeur)"
+							en_society = " (builder/publisher)"
+							if not "impact" in nvd_data['result']['CVE_Items'][0].keys():
 								cve_score = "N/A"
-						published_date = nvd_data['result']['CVE_Items'][0]['publishedDate']
-						formatted_date = published_date.split("T")[0]
-						formatted_date = datetime.strptime(formatted_date,"%Y-%m-%d")
-						date_2_days_ago = datetime.now() - timedelta(days=7)
-						if (date_2_days_ago<=formatted_date) and (formatted_date<=datetime.now()):
-							cve_date_status = "Potentially new CVE"
-						else:
-							cve_date_status = "Potentially an update"
+								try:	
+									webpage = requests.get("https://nvd.nist.gov/vuln/detail/{}".format(cve_id))
+									soup = BeautifulSoup(webpage.content, 'html.parser')
+									cve_cna_score = soup.find(id='Cvss3CnaCalculatorAnchor')
+									cve_cna_score = cve_cna_score.get_text()
+									if cve_cna_score != "":
+										if language == "fr" or language=="FR":
+											cve_score = cve_cna_score + fr_society
+										else:
+											cve_score = cve_cna_score + en_society
+									else:
+										cve_score = "N/A"
+								except:
+										cve_score = "N/A"
+							else:
+								try:
+									cve_score = nvd_data['result']['CVE_Items'][0]['impact']['baseMetricV3']['cvssV3']['baseScore']
+								except:
+									cve_score = "N/A"
+							published_date = nvd_data['result']['CVE_Items'][0]['publishedDate']
+							formatted_date = published_date.split("T")[0]
+							formatted_date = datetime.strptime(formatted_date,"%Y-%m-%d")
+							date_2_days_ago = datetime.now() - timedelta(days=7)
+							if (date_2_days_ago<=formatted_date) and (formatted_date<=datetime.now()):
+								cve_date_status = "Potentially new CVE"
+							else:
+								cve_date_status = "Potentially an update"
 
-						cve_date = published_date.split("T")[0]
-						if language == "fr" or language == "FR":
-							fr_date = cve_date.split("-")
-							cve_date = fr_date[2]+"/"+fr_date[1]+"/"+fr_date[0]
-						if (cve_score=="N/A"):
-							cve_status = cve_date_status+" - "+"Not yet rated (No score, no CPE)"
+							cve_date = published_date.split("T")[0]
+							if language == "fr" or language == "FR":
+								fr_date = cve_date.split("-")
+								cve_date = fr_date[2]+"/"+fr_date[1]+"/"+fr_date[0]
+							if (cve_score=="N/A"):
+								cve_status = cve_date_status+" - "+"Not yet rated (No score, no CPE)"
+							else:
+								cve_status = cve_date_status+" - "+"Valid evaluation"
+							cve_cpe = ""
+							if "configurations" in nvd_data['result']['CVE_Items'][0].keys():
+								if nvd_data['result']['CVE_Items'][0]['configurations']['nodes']:
+									for node in nvd_data['result']['CVE_Items'][0]['configurations']['nodes']:
+										if 'cpe_match' in node.keys():
+											for cpe_node in node['cpe_match']:
+												cve_cpe += (cpe_node['cpe23Uri']+'\n')
+							if cve_cpe == "":
+								cve_cpe = "N/A"
+							cve_description = nvd_data['result']['CVE_Items'][0]['cve']['description']['description_data'][0]['value']
+							nvd_link = 'https://nvd.nist.gov/vuln/detail/'+cve_id
+							if language == "fr" or language=="FR":
+								try:
+									cve_description = translateText(dest_language,cve_description)
+								except:
+									pass
+								if not "/" in cve_date:
+									cve_date = cve_date.split("-")[2]+"/"+cve_date.split("-")[1]+"/"+cve_date.split("-")[0]
+								try:	
+									cve_status = translateText(dest_language,cve_status).replace("nouveau", "une nouvelle").replace("évalué","évaluée")	
+								except:
+									pass
 						else:
-							cve_status = cve_date_status+" - "+"Valid evaluation"
-						cve_cpe = ""
-						if "configurations" in nvd_data['result']['CVE_Items'][0].keys():
-							if nvd_data['result']['CVE_Items'][0]['configurations']['nodes']:
-								for node in nvd_data['result']['CVE_Items'][0]['configurations']['nodes']:
-									if 'cpe_match' in node.keys():
-										for cpe_node in node['cpe_match']:
-											cve_cpe += (cpe_node['cpe23Uri']+'\n')
-						if cve_cpe == "":
+							cve_description = summary
+							date = str(datetime.now()).split(" ")[0].split("-")
+							cve_date = date[2]+"/"+date[1]+"/"+date[0]
+							cve_score = "N/A"
+							cve_sources = "N/A"
+							cve_status = "N/A"
 							cve_cpe = "N/A"
-						cve_description = nvd_data['result']['CVE_Items'][0]['cve']['description']['description_data'][0]['value']
-						nvd_link = 'https://nvd.nist.gov/vuln/detail/'+cve_id
-						if language == "fr" or language=="FR":
-							try:
-								cve_description = translateText(dest_language,cve_description)
-							except:
-								pass
-							if not "/" in cve_date:
-								cve_date = cve_date.split("-")[2]+"/"+cve_date.split("-")[1]+"/"+cve_date.split("-")[0]
+							nvd_link = 'https://nvd.nist.gov/vuln/detail/'+cve_id					
+						status = "Unread"
+						if cve_id not in new_cve_list:
+							cur.execute("INSERT INTO CVE_DATA (CVE_ID,KEYWORD,STATUS,CVE_SCORE,CVE_DATE,CVE_DESCRIPTION,CVE_EVAL,CVE_CPE,CVE_SOURCES,EXPLOIT_FIND,INDEXING_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?);", (cve_id,key_match,status,str(cve_score).split(" ")[0],cve_date,cve_description,cve_status,cve_cpe,cve_sources,"False",idx_date))
+							con.commit()
+							print("New CVE detected -> "+cve_id)
+							report="updated"
 							try:	
-								cve_status = translateText(dest_language,cve_status).replace("nouveau", "une nouvelle").replace("évalué","évaluée")	
-							except:
-								pass
-					else:
-						cve_description = summary
-						date = str(datetime.now()).split(" ")[0].split("-")
-						cve_date = date[2]+"/"+date[1]+"/"+date[0]
-						cve_score = "N/A"
-						cve_sources = "N/A"
-						cve_status = "N/A"
-						cve_cpe = "N/A"
-						nvd_link = 'https://nvd.nist.gov/vuln/detail/'+cve_id					
-					status = "Unread"
-					if cve_id not in new_cve_list:
-						cur.execute("INSERT INTO CVE_DATA (CVE_ID,KEYWORD,STATUS,CVE_SCORE,CVE_DATE,CVE_DESCRIPTION,CVE_EVAL,CVE_CPE,CVE_SOURCES,EXPLOIT_FIND,INDEXING_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?);", (cve_id,key_match,status,str(cve_score).split(" ")[0],cve_date,cve_description,cve_status,cve_cpe,cve_sources,"False",idx_date))
-						con.commit()
-						print("New CVE detected -> "+cve_id)
-						report="updated"
-						try:	
-							sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
-							alert = "sent"
-						except Exception as e:
-							handleException(e)
-							alert = "unsent"
-						new_cve_list.append(cve_id)
-						writeCveTypeLog("cve_poller",cve_id,"new",key_match,str(cve_score).split(" ")[0],cve_date,cve_cpe,report,alert)
+								sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
+								alert = "sent"
+							except Exception as e:
+								handleException(e)
+								alert = "unsent"
+							new_cve_list.append(cve_id)
+							writeCveTypeLog("cve_poller",cve_id,"new",key_match,str(cve_score).split(" ")[0],cve_date,cve_cpe,report,alert)
+			else:
+				if bool(re.search(key,summary,re.IGNORECASE)) == True:
+					key_match = key
+					cur.execute("SELECT CVE_ID FROM CVE_DATA WHERE CVE_ID = (?);", (cve_id,))
+					db_result_list = cur.fetchall()
+					db_result_str = ""
+					for db_result_tuple in db_result_list:
+						for result in db_result_tuple:	
+							db_result_str+=result
+					if cve_id not in db_result_str:
+						time.sleep(15)
+						nvd_base_url = "https://services.nvd.nist.gov/rest/json/cve/1.0/"
+						nvd_query = nvd_base_url+cve_id
+						nvd_response = requests.get(url=nvd_query)
+						nvd_data = nvd_response.json()
+						if 'result' in nvd_data.keys():
+							if 'reference_data' in nvd_data['result']['CVE_Items'][0]['cve']['references']:
+								nvd_links = nvd_data['result']['CVE_Items'][0]['cve']['references']['reference_data']
+								cve_sources = ""
+								for link in nvd_links:
+									cve_sources += (link['url']+"\n")
+							else:
+									cve_sources = "N/A"
+							cve_score = ""
+							fr_society = " (constructeur/éditeur)"
+							en_society = " (builder/publisher)"
+							if not "impact" in nvd_data['result']['CVE_Items'][0].keys():
+								cve_score = "N/A"
+								try:	
+									webpage = requests.get("https://nvd.nist.gov/vuln/detail/{}".format(cve_id))
+									soup = BeautifulSoup(webpage.content, 'html.parser')
+									cve_cna_score = soup.find(id='Cvss3CnaCalculatorAnchor')
+									cve_cna_score = cve_cna_score.get_text()
+									if cve_cna_score != "":
+										if language == "fr" or language=="FR":
+											cve_score = cve_cna_score + fr_society
+										else:
+											cve_score = cve_cna_score + en_society
+									else:
+										cve_score = "N/A"
+								except:
+										cve_score = "N/A"
+							else:
+								try:
+									cve_score = nvd_data['result']['CVE_Items'][0]['impact']['baseMetricV3']['cvssV3']['baseScore']
+								except:
+									cve_score = "N/A"
+							published_date = nvd_data['result']['CVE_Items'][0]['publishedDate']
+							formatted_date = published_date.split("T")[0]
+							formatted_date = datetime.strptime(formatted_date,"%Y-%m-%d")
+							date_2_days_ago = datetime.now() - timedelta(days=7)
+							if (date_2_days_ago<=formatted_date) and (formatted_date<=datetime.now()):
+								cve_date_status = "Potentially new CVE"
+							else:
+								cve_date_status = "Potentially an update"
+
+							cve_date = published_date.split("T")[0]
+							if language == "fr" or language == "FR":
+								fr_date = cve_date.split("-")
+								cve_date = fr_date[2]+"/"+fr_date[1]+"/"+fr_date[0]
+							if (cve_score=="N/A"):
+								cve_status = cve_date_status+" - "+"Not yet rated (No score, no CPE)"
+							else:
+								cve_status = cve_date_status+" - "+"Valid evaluation"
+							cve_cpe = ""
+							if "configurations" in nvd_data['result']['CVE_Items'][0].keys():
+								if nvd_data['result']['CVE_Items'][0]['configurations']['nodes']:
+									for node in nvd_data['result']['CVE_Items'][0]['configurations']['nodes']:
+										if 'cpe_match' in node.keys():
+											for cpe_node in node['cpe_match']:
+												cve_cpe += (cpe_node['cpe23Uri']+'\n')
+							if cve_cpe == "":
+								cve_cpe = "N/A"
+							cve_description = nvd_data['result']['CVE_Items'][0]['cve']['description']['description_data'][0]['value']
+							nvd_link = 'https://nvd.nist.gov/vuln/detail/'+cve_id
+							if language == "fr" or language=="FR":
+								try:
+									cve_description = translateText(dest_language,cve_description)
+								except:
+									pass
+								if not "/" in cve_date:
+									cve_date = cve_date.split("-")[2]+"/"+cve_date.split("-")[1]+"/"+cve_date.split("-")[0]
+								try:	
+									cve_status = translateText(dest_language,cve_status).replace("nouveau", "une nouvelle").replace("évalué","évaluée")	
+								except:
+									pass
+						else:
+							cve_description = summary
+							date = str(datetime.now()).split(" ")[0].split("-")
+							cve_date = date[2]+"/"+date[1]+"/"+date[0]
+							cve_score = "N/A"
+							cve_sources = "N/A"
+							cve_status = "N/A"
+							cve_cpe = "N/A"
+							nvd_link = 'https://nvd.nist.gov/vuln/detail/'+cve_id					
+						status = "Unread"
+						if cve_id not in new_cve_list:
+							cur.execute("INSERT INTO CVE_DATA (CVE_ID,KEYWORD,STATUS,CVE_SCORE,CVE_DATE,CVE_DESCRIPTION,CVE_EVAL,CVE_CPE,CVE_SOURCES,EXPLOIT_FIND,INDEXING_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?);", (cve_id,key_match,status,str(cve_score).split(" ")[0],cve_date,cve_description,cve_status,cve_cpe,cve_sources,"False",idx_date))
+							con.commit()
+							print("New CVE detected -> "+cve_id)
+							report="updated"
+							try:	
+								sendAlert(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers, cve_id, cve_sources, str(cve_score).split(" ")[0], cve_status, cve_cpe, cve_date, cve_description, language,key_match)
+								alert = "sent"
+							except Exception as e:
+								handleException(e)
+								alert = "unsent"
+							new_cve_list.append(cve_id)
+							writeCveTypeLog("cve_poller",cve_id,"new",key_match,str(cve_score).split(" ")[0],cve_date,cve_cpe,report,alert)
 							
 	if not new_cve_list:
 		print(bcolors.HEADER+"No new CVE matched with your keyword list."+bcolors.ENDC)	

@@ -141,8 +141,12 @@ def buildCVEList(language):
             cve_summary = cve.split("(=)")[1]
             cve_id = cve.split("(=)")[0]
             for key in keywords:
-                if bool(re.search(key,cve_summary,re.IGNORECASE)) == True:
-                   registerNewCve(cve_id,"Setup",key) 
+                if bool(re.fullmatch(r'[A-Z0-9-._]{4,}',key)) == True or bool(re.fullmatch(r'\w{1,3}',key)) == True:
+                    if key in cve_summary:
+                        registerNewCve(cve_id,"Setup",key)
+                else:
+                    if bool(re.search(key,cve_summary,re.IGNORECASE)) == True:
+                        registerNewCve(cve_id,"Setup",key) 
         except:
             continue
             time.sleep(5)
