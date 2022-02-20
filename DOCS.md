@@ -36,7 +36,7 @@ Before installation, you must have drawn up :
 
 You will be able to search and add new products after installation via the web UI.
 
-## With docker
+## With docker (recommanded)
 
 With the docker installation, everything is automated. The script creates a self-signed certificate if you wish and configures apache. Obviously, you can change the configuration according to your needs.
 
@@ -44,7 +44,6 @@ The installation with Docker allows via a volume (-v option) to easily update SE
 
 To update it, you will have to : 
 - Go to the folder where SECMON was cloned at installation
-- Add the current folder as a local repo
 - Do a git pull to get the changes
 
 The files will then be modified directly in your SECMON container.
@@ -52,10 +51,10 @@ The files will then be modified directly in your SECMON container.
 
 ### Autosetup
 ```bash
-sudo git clone https://github.com/Guezone/SECMON && cd SECMON && mkdir certs
+sudo git clone https://github.com/Guezone/SECMON && cd SECMON && mkdir certs && PWD=$(pwd)
 sudo docker build . -t secmon:latest
 sudo docker network create --driver=bridge --subnet=10.10.10.0/24 --gateway=10.10.10.254 SECMON_NET
-sudo docker run -i -t --hostname secmonsrv --ip 10.10.10.100 --name secmon-srv -v YOUR_SECMON_INSTALL_PATH/:/var/www/secmon -v YOUR_SECMON_INSTALL_PATH/certs:/etc/ssl/secmon --network SECMON_NET --expose 80 --expose 443 -d secmon:latest
+sudo docker run -i -t --hostname secmonsrv --ip 10.10.10.100 --name secmon-srv -v $PWD/:/var/www/secmon -v $PWD/certs:/etc/ssl/secmon --network SECMON_NET --expose 80 --expose 443 -d secmon:latest
 sudo docker exec -it secmon-srv python3 /var/www/secmon/docker/install.py
 ```
 ```
@@ -99,15 +98,6 @@ SECMON setup script - Version 1.0.0
 ------------------------------------
 SECMON is licensed by CC BY-NC-SA 4.0 license. Do you accept the terms of the license? (y/Y;n/N) : y
 
-Let's go to add your products list for which you want to check the new CVEs. 
- Of course, you can add more with the web interface after installation !
-
-Do you want to use keyword (for CVE polling) (y/Y;n/N) : y
-
-Please enter the keywords you are interested in among CVE publications separated by ';' (ex: Forti;F5;BigIP;Cisco)  :VMWare;PAN-OS;Forti;F5;BigIP;Cisco;iOS;Microsoft Exchange;Microsoft Office;Wireshark
-Do you want to use a list of CPEs (NVD product reference) to complete the keyword search? (y/Y;n/N) : y
-
-Please enter the CPEs for which you want to report the CVE (ex: cpe:2.3:o:microsoft:windows_server_2008:r2:sp1:*:*:*:*:x64:*;cpe:2.3:o:apple:mac_os:-:*:*:*:*:*:*:*) separated by ';'' :cpe:2.3:o:microsoft:windows_10:1909:*:*:*:*:*:*:*;cpe:2.3:a:apache:http_server:2.4.44:*:*:*:*:*:*:*
 
 Do you want to use a Github API for exploit retrieval (y/Y;n/N) : y
 
@@ -119,10 +109,6 @@ Enter the password (please choose a strong password !) : XXXXXXXX
 Confirm the password : XXXXXXXX
 
 RSS news database recording in progress...
-
-Successful build database.
-
-CVE database recording in progress...This operation can take a few minutes to a few hours. Take a coffee! :D
 
 Successful build database.
 
@@ -184,7 +170,7 @@ sudo rm -Rf /var/www/html
 sudo mkdir /var/www/secmon && sudo cp -r * /var/www/secmon/ && cd /var/www/secmon/
 sudo python3 setup.py -sender sender@mail.com -p 'XXXXXXXXXXXXXXXX' -login [your SMTP login, often email address] -server srv.mail.com -port 587 -tls yes -lang fr -r 'receiver1@mail.com;receiver2@mail.com'
 ```
-**Note :** The installation script may take a few minutes or even a few hours. You can also add your product list after install and press "n" on the two instructions.
+**Note :** Since a few time, the product list entry is only on web UI after install. 
 
 **Output :** 
 
@@ -197,13 +183,6 @@ SECMON is licensed by CC BY-NC-SA 4.0 license. Do you accept the terms of the li
 Let's go to add your products list for which you want to check the new CVEs. 
  Of course, you can add more with the web interface after installation !
 
-Do you want to use keyword (for CVE polling) (y/Y;n/N) : y
-
-Please enter the keywords you are interested in among CVE publications separated by ';' (ex: Forti;F5;BigIP;Cisco)  :VMWare;PAN-OS;Forti;F5;BigIP;Cisco;iOS;Microsoft Exchange;Microsoft Office;Wireshark
-Do you want to use a list of CPEs (NVD product reference) to complete the keyword search? (y/Y;n/N) : y
-
-Please enter the CPEs for which you want to report the CVE (ex: cpe:2.3:o:microsoft:windows_server_2008:r2:sp1:*:*:*:*:x64:*;cpe:2.3:o:apple:mac_os:-:*:*:*:*:*:*:*) separated by ';'' :cpe:2.3:o:microsoft:windows_10:1909:*:*:*:*:*:*:*;cpe:2.3:a:apache:http_server:2.4.44:*:*:*:*:*:*:*
-
 Do you want to use a Github API for exploit retrieval (y/Y;n/N) : y
 
 Please enter your Github username : XXXXXXXXXXX
@@ -214,10 +193,6 @@ Enter the password (please choose a strong password !) : XXXXXXXX
 Confirm the password : XXXXXXXX
 
 RSS news database recording in progress...
-
-Successful build database.
-
-CVE database recording in progress...This operation can take a few minutes to a few hours. Take a coffee! :D
 
 Successful build database.
 
@@ -237,7 +212,7 @@ Edit your crontab with **sudo vi /etc/crontab** command, for example like this :
 
 ```
 
-This configuration automates the retrieval of new CVE (and news) every 20 minutes and an update of the scores and associated products every day at 6am.
+This configuration automates the retrieval of new CVE (and news) every 60 minutes and an update of the scores and associated products every day at 6am.
 
 ### Startup
 Launch the main script of the application : 

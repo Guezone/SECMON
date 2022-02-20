@@ -40,7 +40,6 @@ def mailTester(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, l
     print()
     configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, language)
     buildRSSList(rss_feeds)
-    buildCVEList(language)
     script_path = os.path.abspath(__file__)
     dir_path = script_path.replace("setup.py","")
     body = ""
@@ -109,6 +108,9 @@ def buildRSSList(rss_feeds):
     con.execute('''CREATE TABLE RSS_DATA ([key] INTEGER PRIMARY KEY,[RSS_URL] text,[title] text,[rss_f] text,[summary] text)''')
     cur = con.cursor()
     con.commit()
+    con.execute('''CREATE TABLE CVE_DATA ([key] INTEGER PRIMARY KEY,[CVE_ID] text,[KEYWORD] text,[STATUS] text,[CVE_SCORE] text,[CVE_DATE] text,[CVE_DESCRIPTION] text,[CVE_EVAL] text,[CVE_CPE] text,[CVE_SOURCES] text,[EXPLOIT_FIND] text,[INDEXING_DATE] text)''')
+    con.execute('''CREATE TABLE high_risk_products ([key] INTEGER PRIMARY KEY,[cpe] text,[hname] text)''')
+    con.commit()
     for rss_feed in rss_feeds:
         current_feed = feedparser.parse(rss_feed)
         for entries in current_feed.entries:
@@ -117,55 +119,6 @@ def buildRSSList(rss_feeds):
             summary = entries.summary
             cur.execute("INSERT INTO RSS_DATA (RSS_URL, title, rss_f, summary) VALUES (?,?,?,?);", (url,title,rss_feed,summary))
             con.commit()
-    print("Successful build database.\n")
-def buildCVEList(language):
-    script_path = os.path.abspath(__file__)
-    data = ""
-    dir_path = script_path.replace("setup.py","")
-    print("\nCVE database recording in progress...This operation can take a few minutes to a few hours. Take a coffee! :D\n")
-    con = sqlite3.connect(dir_path+'secmon.db')
-    con.execute('''CREATE TABLE high_risk_products ([key] INTEGER PRIMARY KEY,[cpe] text,[hname] text)''')
-    con.execute('''CREATE TABLE CVE_DATA ([key] INTEGER PRIMARY KEY,[CVE_ID] text,[KEYWORD] text,[STATUS] text,[CVE_SCORE] text,[CVE_DATE] text,[CVE_DESCRIPTION] text,[CVE_EVAL] text,[CVE_CPE] text,[CVE_SOURCES] text,[EXPLOIT_FIND] text,[INDEXING_DATE] text)''')
-    cur = con.cursor()
-    cve_rss = []
-    current_feed = feedparser.parse("https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss.xml")
-    for entries in current_feed.entries:
-        title = entries.title
-        summary = entries.summary
-        cve_id = re.findall('CVE-\d{4}-\d{4,7}',title)
-        cve_id = cve_id[0]
-        cve_rss.append(cve_id+"(=)"+summary)
-    keywords = getKeywordsList()
-    for cve in cve_rss:
-        try:
-            cve_summary = cve.split("(=)")[1]
-            cve_id = cve.split("(=)")[0]
-            for key in keywords:
-                if bool(re.fullmatch(r'[A-Z0-9-._]{4,}',key)) == True or bool(re.fullmatch(r'\w{1,3}',key)) == True:
-                    if key in cve_summary:
-                        registerNewCve(cve_id,"Setup",key)
-                else:
-                    if bool(re.search(key,cve_summary,re.IGNORECASE)) == True:
-                        registerNewCve(cve_id,"Setup",key) 
-        except:
-            continue
-            time.sleep(5)
-
-    cpes = getCpeList()
-    if cpes != []:
-        for cpe in cpes:
-            try:
-                time.sleep(20)
-                cve_ids = pollCveIdFromCpe(cpe)
-            except:
-                print("Unable to find CVE related to this product : "+cpe)
-                continue
-            for cve_id in cve_ids:
-                try:
-                    registerNewCve(cve_id,"Setup",cpe)
-                except:
-                    continue
-                    time.sleep(5)
     print("Successful build database.\n")
 
 def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver, language):
@@ -184,37 +137,8 @@ def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver,
     con.execute('''CREATE TABLE keyword_list ([key] INTEGER PRIMARY KEY,[keyword] text)''')
     con.execute('''CREATE TABLE cpe_list ([key] INTEGER PRIMARY KEY,[cpe] text)''')
     con.commit()
-    print("Let's go to add your products list for which you want to check the new CVEs. \n Of course, you can add more with the web interface after installation !\n")
-    key_choice = input("Do you want to use keywords (for CVE polling) (y/Y;n/N) : ")
-    print("Let's go to add your products list for which you want to check the new CVEs. \n Of course, you can add more with the web interface after installation !")
-    if key_choice == "y" or key_choice == "Y":
-        keywords = input("Please enter the keywords you are interested in among CVE publications separated by ';' (ex: iOS;Microsoft;Palo)  :")
-        keyword_conf = []
-        for k in keywords.split(";"):
-            keyword_conf.append(k)
-        for k in keyword_conf:
-            con.execute("INSERT INTO keyword_list (keyword) VALUES (?);", (k,))
-        con.execute("INSERT INTO config (smtp_login,smtp_password,smtpsrv,port,sender, receiver,tls,language) VALUES (?,?,?,?,?,?,?,?);", (smtp_login,enc_pass,smtpsrv,str(port),sender, receiver,tls,language))
-        con.commit()         
-    elif key_choice == "n" or key_choice == "N": 
-        con.execute("INSERT INTO config (smtp_login,smtp_password,smtpsrv,port,sender, receiver,tls,language) VALUES (?,?,?,?,?,?,?,?);", (smtp_login,enc_pass,smtpsrv,str(port),sender, receiver,tls,language))
-        con.commit()         
-    else:
-        print("\nPlease choose if you want to use keywords or not... Exiting.")
-        exit()
-    cpe_choice = input("Do you want to use a list of CPEs (common product reference) to complete the keyword search? (y/Y;n/N) : ")
-    print()
-    if cpe_choice == "y" or cpe_choice == "Y":
-        cpe = input("Please enter the CPEs for which you want to report the CVE (ex: cpe:2.3:o:microsoft:windows_server_2008:r2:sp1:*:*:*:*:x64:*;cpe:2.3:o:apple:mac_os:-:*:*:*:*:*:*:*) separated by ';'' :")
-        cpe = cpe.split(";")
-        for cpe_id in cpe:
-            con.execute("INSERT INTO cpe_list (cpe) VALUES (?);", (cpe_id,))
-        con.commit()
-    elif cpe_choice == "n" or cpe_choice == "N":
-        pass
-    else:
-        print("\nPlease choose if you want to use CPE or not... Exiting.")
-        exit()  
+    con.execute("INSERT INTO config (smtp_login,smtp_password,smtpsrv,port,sender, receiver,tls,language) VALUES (?,?,?,?,?,?,?,?);", (smtp_login,enc_pass,smtpsrv,str(port),sender, receiver,tls,language))
+    con.commit()         
     github_username = input("Please enter your Github username : ")
     github_api_key = input("Please enter your Github API Token : ")
     try:
@@ -273,7 +197,7 @@ def main():
     receivers = ''.join(args.r)
     language = ''.join(args.lang)
     print("------------------------------------")
-    print(f"SECMON setup script - Version {{__version__}}")
+    print(f"SECMON setup script - Version {__version__}")
     print("------------------------------------")
     license_validation = input("SECMON is licensed by CC BY-NC-SA 4.0 license. Do you accept the terms of the license? (y/Y;n/N) : ")
     if license_validation == "y" or license_validation == "Y":
