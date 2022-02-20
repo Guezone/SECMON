@@ -110,6 +110,7 @@ def buildRSSList(rss_feeds):
     con.commit()
     con.execute('''CREATE TABLE CVE_DATA ([key] INTEGER PRIMARY KEY,[CVE_ID] text,[KEYWORD] text,[STATUS] text,[CVE_SCORE] text,[CVE_DATE] text,[CVE_DESCRIPTION] text,[CVE_EVAL] text,[CVE_CPE] text,[CVE_SOURCES] text,[EXPLOIT_FIND] text,[INDEXING_DATE] text)''')
     con.execute('''CREATE TABLE high_risk_products ([key] INTEGER PRIMARY KEY,[cpe] text,[hname] text)''')
+    con.execute('''CREATE TABLE tasks ([key] INTEGER PRIMARY KEY,[task_id] text,[status] text,[comment] text)''')
     con.commit()
     for rss_feed in rss_feeds:
         current_feed = feedparser.parse(rss_feed)

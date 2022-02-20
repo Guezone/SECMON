@@ -273,46 +273,14 @@ def writeAuthLog(source_script,username,auth_status,msg,src_ip):
 	with open(log_file, "a") as f:
 		f.write(log)
 def getTasks():
-	script_path = os.path.abspath(__file__)
-	dir_path = script_path.replace("secmon_lib.py","")
-	logfile = dir_path+"logs.txt"
-	count = 0
-	tid = []
-	if os.path.isfile(logfile) == True:
-		for line in reversed(list(open(logfile))):
-			if "task_id" in line:
-				timestamp = line.split(" ")[0]
-				formatted_date = datetime.fromisoformat(timestamp)
-				date_2_days_ago = datetime.now() - timedelta(hours=2)
-				if (date_2_days_ago<=formatted_date) and (formatted_date<=datetime.now()):
-					task_id = line.split('"')[5]
-					if task_id not in tid:
-						tid.append(task_id)
 	tasks = []
-	for task in tid:
-		status = ""
-		operation = ""
-		if os.path.isfile(logfile) == True:
-			for line in reversed(list(open(logfile))):
-				if f'task_id="{task}"' in line and "loaded" in line:
-					operation += line.split('"')[9].replace("....",".")
-				elif f'task_id="{task}"' in line and "failed" in line:
-					status += "Failed"
-				elif f'task_id="{task}"' in line and "success" in line:
-					status += "Success"
-			if status =="":
-				status="In progress"
-		tasks.append([task,operation,status])
+	con = get_db_connection()
+	cur = con.cursor()
+	cur.execute("SELECT * FROM tasks")
+	db_result_list = cur.fetchall()
+	for db_result_tuple in db_result_list:
+		tasks.append([db_result_tuple[1],db_result_tuple[3],db_result_tuple[2]])
 	return tasks
-def writeTaskLog(source_script,task_id,task_status,message):
-	timestamp = datetime.now().isoformat()
-	server = socket.gethostbyname(socket.gethostname())
-	log = f"""{timestamp} source_script="{source_script}" server="{server}" task_id="{task_id}" task_status="{task_status}" message="{message}" \n"""
-	script_path = os.path.abspath(__file__)
-	dir_path = script_path.replace(os.path.basename(__file__),"")
-	log_file = dir_path+"logs.txt"
-	with open(log_file, "a") as f:
-		f.write(log)
 
 def writeMgmtTasksLog(source_script,message):
 	timestamp = datetime.now().isoformat()
@@ -671,7 +639,12 @@ def registerNewCve(cve_id,reason,product):
 def addProduct(ptype, key_or_cpe):
 	sleep(10)
 	task_id = random.randint(10000,99999)
-	writeTaskLog("secmon_web",task_id,"loaded",f"Adding the following product : {key_or_cpe}....")
+	task_status = "In Progress"
+	task_comment = f"Adding the following product : {key_or_cpe}...."
+	con = get_db_connection()
+	cur = con.cursor()
+	cur.execute("INSERT INTO tasks (task_id, status, comment) VALUES (?,?,?);", (task_id,task_status,task_comment))
+	con.commit()
 	if ptype == "CPE":
 		con = get_db_connection()
 		cur = con.cursor()
@@ -696,11 +669,17 @@ def addProduct(ptype, key_or_cpe):
 				raise Exception('The CPE is in a bad format.')         
 			cur.execute("INSERT INTO cpe_list (cpe) VALUES (?);", (key_or_cpe,))
 			con.commit()
-			writeTaskLog("secmon_web",task_id,"success",f"Following product successfully added : {key_or_cpe} !")        
+			task_status = "Success"
+			task_comment = f"Following product successfully added : {key_or_cpe} !"
+			cur.execute("UPDATE tasks SET status = (?),comment = (?) WHERE task_id = (?)", (task_status,task_comment,task_id))
+			con.commit()      
 
 		except Exception as e:
 			handleException(e)
-			writeTaskLog("secmon_web",task_id,"failed",f"Unable to add this product : {key_or_cpe}. {str(e)}.") 
+			task_status = "Failed"
+			task_comment = f"Unable to add this product : {key_or_cpe}. {str(e)}."
+			cur.execute("UPDATE tasks SET status = (?),comment = (?) WHERE task_id = (?)", (task_status,task_comment,task_id))
+			con.commit() 
 	else:
 		con = get_db_connection()
 		cur = con.cursor()
@@ -723,11 +702,17 @@ def addProduct(ptype, key_or_cpe):
 				 raise Exception('Product already exist ! ')
 			cur.execute("INSERT INTO keyword_list (keyword) VALUES (?);", (key_or_cpe,))
 			con.commit()
-			writeTaskLog("secmon_web",task_id,"success",f"Following product successfully added : {key_or_cpe} !") 
+			task_status = "Success"
+			task_comment = f"Following product successfully added : {key_or_cpe} !"
+			cur.execute("UPDATE tasks SET status = (?),comment = (?) WHERE task_id = (?)", (task_status,task_comment,task_id))
+			con.commit()     
 			return "OK"
 		except Exception as e:
 			handleException(e)
-			writeTaskLog("secmon_web",task_id,"failed",f"Unable to add this product : {key_or_cpe}. {str(e)}.") 
+			task_status = "Failed"
+			task_comment = f"Unable to add this product : {key_or_cpe}. {str(e)}."
+			cur.execute("UPDATE tasks SET status = (?),comment = (?) WHERE task_id = (?)", (task_status,task_comment,task_id))
+			con.commit()
 			return "NOK"
 def getProductsStats():
 	product_number = 0
