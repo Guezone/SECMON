@@ -649,12 +649,19 @@ def registerNewCve(cve_id,reason,product):
 				status = "Found when the product was added."
 			elif reason == "NewPolling":
 				status = "Unread"
+				# Ajouter la mention du score CNA avec sa traduction EN/FR si c'est le cas
+				# Traduction description + status
+				# NVD link
+				# Print New CVE detected
+				# Send alert
+
 			elif reason == "Setup":
 				status = "Native"
 			else:
 				status = "N/A"        
 			cur.execute("INSERT INTO CVE_DATA (CVE_ID,KEYWORD,STATUS,CVE_SCORE,CVE_DATE,CVE_DESCRIPTION,CVE_EVAL,CVE_CPE,CVE_SOURCES,EXPLOIT_FIND,INDEXING_DATE) VALUES (?,?,?,?,?,?,?,?,?,?,?);", (cve_id,key_match,status,str(cve_score),cve_date,cve_description,cve_status,cve_cpe,cve_sources,"False",idx_date))
 			con.commit()
+			# Write CVE type log
 			return "ok"
 		else:
 			return "already"
@@ -1028,7 +1035,7 @@ def mailTester(smtp_login, smtp_password, smtpsrv, port, tls, sender, receivers)
 		con = get_db_connection()
 		cur = con.cursor()
 		cur.execute("UPDATE config SET sender = (?)", (sender,))
-		cur.execute("UPDATE config SET password = (?)", ((str(base64.b64encode(smtp_password.encode("UTF-8"))).replace("b'","")).replace("'",""),))
+		cur.execute("UPDATE config SET smtp_password = (?)", ((str(base64.b64encode(smtp_password.encode("UTF-8"))).replace("b'","")).replace("'",""),))
 		cur.execute("UPDATE config SET smtp_login = (?)", (smtp_login,))
 		cur.execute("UPDATE config SET smtpsrv = (?)", (smtpsrv,))
 		cur.execute("UPDATE config SET port = (?)", (port,))
