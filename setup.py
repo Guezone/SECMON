@@ -141,7 +141,7 @@ def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver,
     con.execute("INSERT INTO config (smtp_login,smtp_password,smtpsrv,port,sender, receiver,tls,language) VALUES (?,?,?,?,?,?,?,?);", (smtp_login,enc_pass,smtpsrv,str(port),sender, receiver,tls,language))
     con.commit()         
     github_username = input("Please enter your Github username : ")
-    github_api_key = input("Please enter your Github API Token : ")
+    github_api_key = getpass("Please enter your Github API Token : ")
     try:
         login_attempt = requests.get('https://api.github.com/search/repositories?q=github+api', auth=(github_username,github_api_key))
         if login_attempt.status_code != 200:

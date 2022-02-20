@@ -1,5 +1,6 @@
 from time import sleep
 import os
+from getpass import getpass
 print("| SECMON - DockerAutoInstall |")
 print("1. Certificate : ")
 print("Note 1 : You can delete this self signed cert and put your CA signed cert after install. ")
@@ -13,14 +14,14 @@ print("-------------------------------------------------------------------------
 print("2. SECMON Install : ")
 sender = input("Sender email address :")
 smtp_login = input("SMTP account login :")
-smtp_password = input("SMTP email account password :")
+smtp_password = getpass("SMTP email account password :")
 smtpsrv = input("SMTP Server FQDN or IP :") 
 smtpport = input("SMTP used port :") 
 tls = input("Using TLS SMTP auth ? (yes/no) :")
 lang = input("Language (en/fr) :")
 receivers = input("SECMON email receivers (single or many seperated by ;):")
 os.system(f"chown -R www-data:www-data /var/www/secmon && chmod -R 744 /var/www/secmon")
-os.system(f"python3 /var/www/secmon/setup.py -login {smtp_login} -p '{smtp_password}' -server {smtpsrv} -port {smtpport} -tls {tls} -lang {lang} -sender {sender} -r {receivers}")
+os.system(f"python3 /var/www/secmon/setup.py -login '{smtp_login}' -p '{smtp_password}' -server '{smtpsrv}' -port '{smtpport}' -tls '{tls}' -lang '{lang}' -sender '{sender}' -r '{receivers}'")
 print("Executing secmon in background...")
 os.system("nohup python3 /var/www/secmon/secmon.py >/dev/null 2>&1 &")
 print("Executing cve_updater in background...")
