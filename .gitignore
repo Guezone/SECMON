@@ -4,3 +4,4 @@ logs.txt
 __pycache__/
 stats.py
 test.py
+certs/
