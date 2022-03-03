@@ -3,14 +3,15 @@
 # Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#priority-of-environment-variables
-stages:
-- build
-- test
+variables:
+  reg_password: $reg_password
+  reg_username: $reg_username
+  CI_REGISTRY_IMAGE: 'secmon'
+
+
 build:
-  stage: build
   script:
-  - docker build -t guezone/secmon:latest .
-test:
-  stage: test
-include:
-- template: Auto-DevOps.gitlab-ci.yml
+  - docker login git.gueznet.local -u $reg_username -p reg_password
+  - docker pull $CI_REGISTRY_IMAGE:latest || true
+  - docker build --cache-from -t $CI_REGISTRY_IMAGE .
+  - docker push $CI_REGISTRY_IMAGE:latest
