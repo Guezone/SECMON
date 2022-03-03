@@ -11,6 +11,6 @@ build:
   script:
   - docker build -t guezone/secmon:latest .
 test:
-  stage: sast
+  stage: test
 include:
 - template: Auto-DevOps.gitlab-ci.yml
