@@ -4,13 +4,13 @@
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#priority-of-environment-variables
 stages:
-- Build
-- SAST
-docker_build:
-  stage: Build
+- build
+- sast
+build:
+  stage: build
   script:
   - docker build -t guezone/secmon:latest .
 sast:
-  stage: SAST
+  stage: sast
 include:
 - template: Auto-DevOps.gitlab-ci.yml
