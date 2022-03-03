@@ -5,12 +5,12 @@
 # See https://docs.gitlab.com/ee/ci/variables/#priority-of-environment-variables
 stages:
 - build
-- sast
+- test
 build:
   stage: build
   script:
   - docker build -t guezone/secmon:latest .
-sast:
+test:
   stage: sast
 include:
 - template: Auto-DevOps.gitlab-ci.yml
