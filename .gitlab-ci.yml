@@ -5,25 +5,12 @@
 # See https://docs.gitlab.com/ee/ci/variables/#priority-of-environment-variables
 stages:
 - Build
-- build
-- test
-- deploy
-- review
-- dast
-- staging
-- canary
-- production
-- incremental rollout 10%
-- incremental rollout 25%
-- incremental rollout 50%
-- incremental rollout 100%
-- performance
-- cleanup
+- SAST
 docker_build:
   stage: Build
   script:
   - docker build -t guezone/secmon:latest .
 sast:
-  stage: test
+  stage: SAST
 include:
 - template: Auto-DevOps.gitlab-ci.yml
