@@ -1,17 +1,17 @@
 variables:
-  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  # Tell 'docker:dind' to enable TLS (recommended)
-  # and generate certificates in the specified directory.
-  DOCKER_TLS_CERTDIR: "/certs"
+  reg_password: $reg_password
+  reg_username: $reg_username
 
-build-push-docker-image-job:
-  # Specify a Docker image to run the job in.
-  image: docker:latest
-  # Specify an additional image 'docker:dind' ("Docker-in-Docker") that
-  # will start up the Docker daemon when it is brought up by a runner.
-  services:
-    - docker:dind
+stages:
+  - debug
+
+
+build:
+  stage: debug
   script:
-    - docker login -u root -p 'Mh*!KfxTDc7nmQc!ytfW%4Gy45L%A' $CI_REGISTRY
-    - docker build -t $IMAGE_TAG .
-    - docker push $IMAGE_TAG
+  - env
+  - echo ${CI_REGISTRY_IMAGE}
+  - docker login git.gueznet.local -u $reg_username -p $reg_password
+  - docker pull ${CI_REGISTRY_IMAGE}:latest || true
+  - docker build -t ${CI_REGISTRY_IMAGE} .
+  - docker push ${CI_REGISTRY_IMAGE}:latest
