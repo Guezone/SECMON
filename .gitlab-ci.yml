@@ -1,4 +1,3 @@
-
 variables:
   IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   # Tell 'docker:dind' to enable TLS (recommended)
@@ -13,6 +12,6 @@ build-push-docker-image-job:
   services:
     - docker:dind
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u root -p 'Mh*!KfxTDc7nmQc!ytfW%4Gy45L%A' $CI_REGISTRY
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
