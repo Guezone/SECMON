@@ -11,7 +11,7 @@ variables:
 
 build:
   script:
-  - docker login git.gueznet.local -u $reg_username -p reg_password
+  - docker login git.gueznet.local -u $reg_username -p $reg_password
   - docker pull $CI_REGISTRY_IMAGE:latest || true
   - docker build --cache-from -t $CI_REGISTRY_IMAGE .
   - docker push $CI_REGISTRY_IMAGE:latest
