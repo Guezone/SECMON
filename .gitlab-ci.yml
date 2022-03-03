@@ -6,7 +6,7 @@
 variables:
   reg_password: $reg_password
   reg_username: $reg_username
-  CI_REGISTRY_IMAGE: 'secmon'
+  CI_REGISTRY_IMAGE: 'git.gueznet.local/secmon'
 
 
 build:
