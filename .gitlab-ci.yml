@@ -1,12 +1,23 @@
 variables:
   reg_password: $reg_password
   reg_username: $reg_username
+GIT_STRATEGY: none
+ANCHORE_HOST_ID: "localhost"
+ANCHORE_ENDPOINT_HOSTNAME: "localhost"
+ANCHORE_CLI_USER: "admin"
+ANCHORE_CLI_PASS: "foobar"
+ANCHORE_CLI_SSL_VERIFY: "n"
+ANCHORE_FAIL_ON_POLICY: "true"
+ANCHORE_TIMEOUT: 500
+
+include:
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
 
 stages:
   - debug
 
 
-Build Docker Image:
+Build Image:
   stage: debug
   script:
   - env
@@ -15,3 +26,32 @@ Build Docker Image:
   - docker pull registry.gueznet.local:443/repos/secmon:latest || true
   - docker build . -t registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - docker push registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+
+container_scan:
+  stage: scan
+  image:
+  name: anchore/anchore-engine:latest
+  entrypoint: [""]
+  services:
+    - name: anchore/engine-db-preload:latest
+  alias: anchore-db
+  script:
+- |
+curl -o /tmp/anchore_ci_tools.py https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/anchore_ci_tools.py
+chmod +x /tmp/anchore_ci_tools.py
+ln -s /tmp/anchore_ci_tools.py /usr/local/bin/anchore_ci_tools
+- anchore_ci_tools --setup
+- anchore-cli registry add "$CI_REGISTRY" gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate
+- anchore_ci_tools --analyze --report --image "$IMAGE_NAME" --timeout "$ANCHORE_TIMEOUT"
+- |
+if ; then
+anchore-cli evaluate check "$IMAGE_NAME"
+else
+set +o pipefail
+anchore-cli evaluate check "$IMAGE_NAME" | tee /dev/null
+fi
+
+artifacts:
+name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
+paths:
+- image-*-report.json
