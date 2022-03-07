@@ -1,14 +1,6 @@
 variables:
   reg_password: $reg_password
   reg_username: $reg_username
-GIT_STRATEGY: none
-ANCHORE_HOST_ID: "localhost"
-ANCHORE_ENDPOINT_HOSTNAME: "localhost"
-ANCHORE_CLI_USER: "admin"
-ANCHORE_CLI_PASS: "foobar"
-ANCHORE_CLI_SSL_VERIFY: "n"
-ANCHORE_FAIL_ON_POLICY: "true"
-ANCHORE_TIMEOUT: 500
 
 include:
   - template: Security/Dependency-Scanning.gitlab-ci.yml
@@ -27,31 +19,23 @@ Build Image:
   - docker build . -t registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - docker push registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
-container_scan:
+container_scan_service:
   stage: scan
-  image:
-  name: anchore/anchore-engine:latest
-  entrypoint: [""]
+  variables:
+    ANCHORE_CLI_URL: "http://anchore-engine:8228/v1"
+    GIT_STRATEGY: none
+  image: docker.io/anchore/inline-scan:latest
   services:
-    - name: anchore/engine-db-preload:latest
-  alias: anchore-db
+  - name: docker.io/anchore/inline-scan:latest
+    alias: anchore-engine
+    command: ["start"]
+  
   script:
-- |
-curl -o /tmp/anchore_ci_tools.py https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/anchore_ci_tools.py
-chmod +x /tmp/anchore_ci_tools.py
-ln -s /tmp/anchore_ci_tools.py /usr/local/bin/anchore_ci_tools
-- anchore_ci_tools --setup
-- anchore-cli registry add "$CI_REGISTRY" gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate
-- anchore_ci_tools --analyze --report --image "$IMAGE_NAME" --timeout "$ANCHORE_TIMEOUT"
-- |
-if ; then
-anchore-cli evaluate check "$IMAGE_NAME"
-else
-set +o pipefail
-anchore-cli evaluate check "$IMAGE_NAME" | tee /dev/null
-fi
+  - anchore-cli system wait
+  - anchore-cli registry add registry.gueznet.local:443 gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate 
+  - anchore_ci_tools.py -a -r --timeout 500 --image registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
-artifacts:
-name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
-paths:
-- image-*-report.json
+  artifacts:
+    name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
+    paths:
+    - anchore-reports/*
