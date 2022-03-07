@@ -10,7 +10,6 @@ stages:
 Build Image:
   stage: build
   script:
-  - env
   - echo ${CI_REGISTRY_IMAGE}
   - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
   - docker pull registry.gueznet.local:443/repos/secmon:latest || true
@@ -31,7 +30,8 @@ Scan Image:
   script:
   - anchore-cli system wait
   - anchore-cli registry add registry.gueznet.local:443 gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate --insecure
-  - anchore_ci_tools.py -a -r --timeout 500 --image registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+  - anchore-cli evaluate check registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+#  - anchore_ci_tools.py -a -r --timeout 500 --image registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
   artifacts:
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
