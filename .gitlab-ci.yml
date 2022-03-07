@@ -6,12 +6,12 @@ stages:
   - debug
 
 
-build:
+Build Docker Image:
   stage: debug
   script:
   - env
   - echo ${CI_REGISTRY_IMAGE}
   - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
   - docker pull registry.gueznet.local:443/repos/secmon:latest || true
-  - docker build . -t registry.gueznet.local:443/repos/secmon:latest
-  - docker push registry.gueznet.local:443/repos/secmon:latest
+  - docker build . -t registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+  - docker push registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
