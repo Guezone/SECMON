@@ -30,7 +30,7 @@ container_scan_service:
   
   script:
   - anchore-cli system wait
-  - anchore-cli registry add registry.gueznet.local:443 gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate 
+  - anchore-cli registry add registry.gueznet.local:443 gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate --insecure
   - anchore_ci_tools.py -a -r --timeout 500 --image registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
   artifacts:
