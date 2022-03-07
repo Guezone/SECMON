@@ -6,11 +6,12 @@ include:
   - template: Security/Dependency-Scanning.gitlab-ci.yml
 
 stages:
-  - debug
+  - build
+  - scan
 
 
 Build Image:
-  stage: debug
+  stage: build
   script:
   - env
   - echo ${CI_REGISTRY_IMAGE}
