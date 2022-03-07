@@ -17,7 +17,7 @@ Build Image:
   - docker build . -t registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - docker push registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
-container_scan_service:
+Scan Image:
   stage: scan
   variables:
     ANCHORE_CLI_URL: "http://anchore-engine:8228/v1"
