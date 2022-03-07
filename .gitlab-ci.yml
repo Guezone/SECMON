@@ -11,7 +11,7 @@ build:
   script:
   - env
   - echo ${CI_REGISTRY_IMAGE}
-  - docker login git.gueznet.local -u $reg_username -p $reg_password
-  - docker pull git.gueznet.local/repos/secmon:latest || true
-  - docker build . -t git.gueznet.local/repos/secmon:latest
-  - docker push git.gueznet.local/repos/secmon:latest
+  - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
+  - docker pull registry.gueznet.local:443/repos/secmon:latest || true
+  - docker build . -t registry.gueznet.local:443/repos/secmon:latest
+  - docker push registry.gueznet.local:443/repos/secmon:latest
