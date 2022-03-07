@@ -2,9 +2,6 @@ variables:
   reg_password: $reg_password
   reg_username: $reg_username
 
-include:
-  - template: Security/Dependency-Scanning.gitlab-ci.yml
-
 stages:
   - build
   - scan
