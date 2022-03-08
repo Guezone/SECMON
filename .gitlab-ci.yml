@@ -41,12 +41,6 @@ Malware-Scan:
     when: on_failure
     paths:
     - scan-results.txt
-  volumes:
-    volume1:
-      path: /var/www/secmon
-      mode:
-      - rw
-      - Z
 
 
 
