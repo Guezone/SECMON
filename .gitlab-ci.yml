@@ -18,16 +18,7 @@ Build-Image:
   - docker build . -t registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - docker push registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
-Vuln-Scan:
-  stage: vuln_scan
-  variables:
-    ANCHORE_CLI_URL: "http://anchore-engine:8228/v1"
-    GIT_STRATEGY: none
-  image: docker.io/anchore/inline-scan:latest
-  services:
-  - name: docker.io/anchore/inline-scan:latest
-    alias: anchore-engine
-    command: ["start"]
+
   
   script:
   - anchore-cli system wait
