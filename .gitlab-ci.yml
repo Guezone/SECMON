@@ -25,10 +25,12 @@ Build-Image:
 Malware-Scan:
   stage: malware_scan
   script:
+  - docker stop secmon-test && docker rm secmon-test 
   - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
   - docker run -i -t --name secmon-test -v $PWD/:/var/www/secmon -v $PWD/certs:/etc/ssl/secmon --expose 80 --expose 443 -d registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - docker exec secmon-test bash -c 'apt update && apt install -y clamav && freshclam'
   - docker exec secmon-test clamscan -r / | tee scan-results.txt
+  - docker stop secmon-test && docker rm secmon-test 
   allow_failure: true
   artifacts:
     when: on_failure
