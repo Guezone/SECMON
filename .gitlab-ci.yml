@@ -31,8 +31,8 @@ Malware-Scan:
   - docker run -i -t --name secmon-test -v $PWD/:/var/www/secmon -v $PWD/certs:/etc/ssl/secmon --expose 80 --expose 443 -d registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - docker exec secmon-test bash -c 'apt update && apt install -y clamav && freshclam'
   - docker exec -it secmon-test bash -c 'cd /var/www/secmon && python3 -c "import secmon_lib" && python3 -c "from secmon_web import *" 2>/dev/null'
-  - docker exec secmon-test clamscan -r /var/www/secmon | tee scan-results.txt
-  - docker exec secmon-test clamscan -r /usr/local/lib/ | tee -a scan-results.txt 
+  - docker exec secmon-test clamscan  --infected -r /var/www/secmon | tee scan-results.txt
+  - docker exec secmon-test clamscan  --infected -r /usr/local/lib/ | tee -a scan-results.txt 
   - docker stop secmon-test && docker rm secmon-test 
   allow_failure: true
   artifacts:
