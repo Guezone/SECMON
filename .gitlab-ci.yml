@@ -1,8 +1,6 @@
 variables:
   reg_password: $reg_password
   reg_username: $reg_username
-  SHARED_PATH: /builds/shared/$CI_PROJECT_PATH
-
 
 stages:
   - build
@@ -19,15 +17,11 @@ Build-Image:
   - docker pull registry.gueznet.local:443/repos/secmon:latest || true
   - docker build . -t registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - docker push registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
-
-
-
-
+  allow_failure: true
 
 Malware-Scan:
   stage: malware_scan
   script:
-  - mkdir -p ${SHARED_PATH}
   - docker stop secmon-test && docker rm secmon-test || true
   - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
   - docker run -i -t --name secmon-test --expose 80 --expose 443 -d registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
@@ -37,17 +31,20 @@ Malware-Scan:
   - docker exec secmon-test clamscan  --infected -r /var/www/secmon | tee scan-results.txt
   - docker exec secmon-test clamscan  --infected -r /usr/local/lib/ | tee -a scan-results.txt 
   - docker stop secmon-test && docker rm secmon-test 
-  allow_failure: false
+  allow_failure: true
 
 
 
 Test:
   stage: test
   script:
+  - docker stop secmon-test && docker rm secmon-test || true
   - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
-  - docker run -i -t --name secmon-test -v ${SHARED_PATH}/:/var/www/secmon -v ${SHARED_PATH}/certs:/etc/ssl/secmon --expose 80 --expose 443 -d registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
-  - docker exec -it secmon-test bash -c 'cd /var/www/secmon && python3 -c "import secmon_lib" && python3 -c "from secmon_web import *"'
+  - docker run -i -t --name secmon-test --expose 80 --expose 443 -d registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+  - docker cp . secmon-test:/var/www/secmon
+  - docker exec secmon-test bash -c 'cd /var/www/secmon && python3 -c "import secmon_lib" && python3 -c "from secmon_web import *"'
   - docker stop secmon-test && docker rm secmon-test 
+  allow_failure: true
 
 Release-Image:
   stage: release_image
@@ -55,7 +52,7 @@ Release-Image:
   - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
   - docker tag registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG registry.gueznet.local:443/repos/secmon:latest
   - docker push registry.gueznet.local:443/repos/secmon:latest
-
+  allow_failure: false
 
 Github-Push:
   stage: release_github
