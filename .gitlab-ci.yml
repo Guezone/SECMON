@@ -32,6 +32,7 @@ Malware-Scan:
   - docker exec secmon-test bash -c 'apt update && apt install -y clamav && freshclam'
   - docker exec -it secmon-test bash -c 'cd /var/www/secmon && python3 -c "import secmon_lib" && python3 -c "from secmon_web import *" 2>/dev/null'
   - docker exec secmon-test clamscan -r /var/www/secmon | tee scan-results.txt
+  - docker exec secmon-test clamscan -r /usr/local/lib/ | tee -a scan-results.txt 
   - docker stop secmon-test && docker rm secmon-test 
   allow_failure: true
   artifacts:
