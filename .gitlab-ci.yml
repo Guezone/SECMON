@@ -4,7 +4,7 @@ variables:
 
 stages:
   - build
-  - vuln_scan
+#  - vuln_scan
   - malware_scan
   - test
   - release_image
