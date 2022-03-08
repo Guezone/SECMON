@@ -19,15 +19,7 @@ Build-Image:
   - docker push registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
 
-  
-  script:
-  - anchore-cli system wait
-  - anchore-cli registry add registry.gueznet.local:443 gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate --insecure
-  - anchore-cli image add registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
-  - anchore-cli image wait registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
-  - anchore-cli image vuln registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG all
-#  - anchore-cli evaluate check --detail registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
-#  - anchore_ci_tools.py -a -r --timeout 500 --image registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+
 
 
 Malware-Scan:
