@@ -37,11 +37,7 @@ Malware-Scan:
   - docker exec secmon-test clamscan  --infected -r /var/www/secmon | tee scan-results.txt
   - docker exec secmon-test clamscan  --infected -r /usr/local/lib/ | tee -a scan-results.txt 
   - docker stop secmon-test && docker rm secmon-test 
-  allow_failure: true
-  artifacts:
-    when: on_failure
-    paths:
-    - scan-results.txt
+  allow_failure: false
 
 
 
