@@ -27,6 +27,7 @@ Build-Image:
 Malware-Scan:
   stage: malware_scan
   script:
+  - mkdir -p ${SHARED_PATH}
   - docker stop secmon-test && docker rm secmon-test || true
   - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
   - PWD=$(pwd)
