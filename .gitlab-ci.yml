@@ -34,14 +34,24 @@ Vuln-Scan:
   - anchore-cli registry add registry.gueznet.local:443 gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate --insecure
   - anchore-cli image add registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - anchore-cli image wait registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
-  - anchore-cli evaluate check --detail registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+  - anchore-cli image vuln registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG all
+#  - anchore-cli evaluate check --detail registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 #  - anchore_ci_tools.py -a -r --timeout 500 --image registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
 
 Malware-Scan:
   stage: malware_scan
   script:
-  - echo ''
+  - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
+  - docker run -i -t --name secmon-test -v $PWD/:/var/www/secmon -v $PWD/certs:/etc/ssl/secmon --expose 80 --expose 443 -d registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+  - docker exec -it secmon-test bash -c 'apt update && apt install -y clamav && freshclam'
+  - docker exec -it secmon-test clamscan -r / | tee scan-results.txt
+  allow_failure: true
+  artifacts:
+    when: on_failure
+    paths:
+    - scan-results.txt
+
 
 Test:
   stage: test
