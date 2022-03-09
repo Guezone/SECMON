@@ -4,7 +4,7 @@ variables:
 
 stages:
   - build
-#  - vuln_scan
+  - vuln_scan
   - malware_scan
   - test
   - release_image
@@ -17,7 +17,28 @@ Build-Image:
   - docker pull registry.gueznet.local:443/repos/secmon:latest || true
   - docker build . -t registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
   - docker push registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
-  allow_failure: true
+  allow_failure: false
+
+Vuln-Scan:
+  stage: vuln_scan
+  variables:
+    ANCHORE_CLI_URL: "http://anchore-engine:8228/v1"
+    GIT_STRATEGY: none
+  image: docker.io/anchore/inline-scan:latest
+  services:
+  - name: docker.io/anchore/inline-scan:latest
+    alias: anchore-engine
+    command: ["start"]
+  allow_failure: false
+  
+  script:
+  - anchore-cli system wait
+  - anchore-cli registry add registry.gueznet.local:443 gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate --insecure
+  - anchore-cli image add registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+  - anchore-cli image wait registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+  - anchore-cli image vuln registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG all
+#  - anchore-cli evaluate check --detail registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
+#  - anchore_ci_tools.py -a -r --timeout 500 --image registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG
 
 Malware-Scan:
   stage: malware_scan
@@ -28,12 +49,10 @@ Malware-Scan:
   - docker cp . secmon-test:/var/www/secmon
   - docker exec secmon-test bash -c 'apt update && apt install -y clamav && freshclam'
   - docker exec secmon-test bash -c 'cd /var/www/secmon && python3 -c "import secmon_lib" && python3 -c "from secmon_web import *" 2>/dev/null' || true
-  - docker exec secmon-test clamscan  --infected -r /var/www/secmon | tee scan-results.txt
-  - docker exec secmon-test clamscan  --infected -r /usr/local/lib/ | tee -a scan-results.txt 
+  - docker exec secmon-test clamscan --remove  --infected -r /var/www/secmon | tee scan-results.txt
+  - docker exec secmon-test clamscan --remove --infected -r /usr/local/lib/ | tee -a scan-results.txt 
   - docker stop secmon-test && docker rm secmon-test 
   allow_failure: true
-
-
 
 Test:
   stage: test
