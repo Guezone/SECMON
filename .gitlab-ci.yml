@@ -1,6 +1,8 @@
 variables:
   reg_password: $reg_password
   reg_username: $reg_username
+  docker_hub_password: $docker_hub_password
+  docker_hub_login: $docker_hub_login
 
 stages:
   - build
@@ -71,6 +73,9 @@ Release-Image:
   - docker login registry.gueznet.local:443 -u $reg_username -p $reg_password
   - docker tag registry.gueznet.local:443/repos/secmon:$CI_COMMIT_REF_SLUG registry.gueznet.local:443/repos/secmon:latest
   - docker push registry.gueznet.local:443/repos/secmon:latest
+  - docker login registry-1.docker.io -u $docker_hub_password -p $docker_hub_login
+  - docker tag registry.gueznet.local:443/repos/secmon:latest guezone/secmon:latest
+  - docker push guezone/secmon:latest
   allow_failure: false
 
 Github-Push:
