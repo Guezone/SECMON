@@ -5,7 +5,7 @@ requests==2.22.0
 colorama==0.4.3
 tweepy==3.8.0
 openpyxl==3.0.5
-cve_searchsploit==1.6
+git+https://github.com/Guezone/cve_searchsploit
 Flask==2.0.3
 deep_translator==1.3.2
 feedparser==6.0.8
