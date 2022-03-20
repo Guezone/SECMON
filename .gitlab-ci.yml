@@ -10,12 +10,11 @@ stages:
   - malware_scan
   - test
   - release_image
-  - release_github
 
 Build-Image:
   stage: build
   script:
-  - docker login registry.gueznet.local:443 -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
+  - docker login $PRIVATE_REGISTRY_URL -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
   - docker pull $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:latest || true
   - docker build . -t $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
   - docker push $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
@@ -33,7 +32,7 @@ Vuln-Scan:
     command: ["start"]
   script:
   - anchore-cli system wait
-  - anchore-cli registry add registry.gueznet.local:443 gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate --insecure
+  - anchore-cli registry add $PRIVATE_REGISTRY_URL gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate --insecure
   - anchore-cli image add $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
   - anchore-cli image wait $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
   - anchore-cli image vuln $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG all
@@ -43,7 +42,7 @@ Malware-Scan:
   stage: malware_scan
   script:
   - docker stop secmon-test && docker rm secmon-test || true
-  - docker login registry.gueznet.local:443 -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
+  - docker login $PRIVATE_REGISTRY_URL -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
   - docker run -i -t --name secmon-test --expose 80 --expose 443 -d $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
   - docker cp . secmon-test:/var/www/secmon
   - docker exec secmon-test bash -c 'apt update && apt install -y clamav && freshclam'
@@ -57,7 +56,7 @@ Test:
   stage: test
   script:
   - docker stop secmon-test && docker rm secmon-test || true
-  - docker login registry.gueznet.local:443 -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
+  - docker login $PRIVATE_REGISTRY_URL -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
   - docker run -i -t --name secmon-test --expose 80 --expose 443 -d $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
   - docker cp . secmon-test:/var/www/secmon
   - docker exec secmon-test bash -c 'cd /var/www/secmon && python3 -c "import secmon_lib" && python3 -c "from secmon_web import *"'
@@ -67,16 +66,11 @@ Test:
 Release-Image:
   stage: release_image
   script:
-  - docker login registry.gueznet.local:443 -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
+  - docker login $PRIVATE_REGISTRY_URL -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
   - docker tag $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:latest
   - docker push $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:latest
   - docker login -u $DOCKER_HUB_PASSWD -p $DOCKER_HUB_USERNAME
   - docker tag $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:latest guezone/secmon:latest
   - docker push guezone/secmon:latest
-  allow_failure: false
-
-Github-Push:
-  stage: release_github
-  script:
-  - echo 'to do'
+  allow_failure: true
 
