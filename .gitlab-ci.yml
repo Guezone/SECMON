@@ -1,9 +1,17 @@
 variables:
   PRIVATE_REGISTRY_PASSWD: $PRIVATE_REGISTRY_PASSWD
   PRIVATE_REGISTRY_USERNAME: $PRIVATE_REGISTRY_USERNAME
+  PRIVATE_REGISTRY_URL: $PRIVATE_REGISTRY_URL
   DOCKER_HUB_PASSWD: $DOCKER_HUB_PASSWD
   DOCKER_HUB_USERNAME: $DOCKER_HUB_USERNAME
-
+  FQDN: $SECMON_FQDN
+  SENDER: $SECMON_SENDER
+  SMTP_PASSWD: $SECMON_SMTP_PASSWD
+  SMTP_SRV: $SECMON_SMTP_SRV
+  GITHUB_USERNAME: $SECMON_GITHUB_USERNAME
+  GITHUB_API_KEY: $SECMON_GITHUB_API_KEY
+  WEB_USERNAME: $SECMON_WEB_USERNAME
+  WEB_PASSWD: $SECMON_WEB_PASSWD 
 stages:
   - build
   - vuln_scan
@@ -41,27 +49,37 @@ Vuln-Scan:
 Malware-Scan:
   stage: malware_scan
   script:
-  - docker stop secmon-test && docker rm secmon-test || true
+  - docker stop secmontest && docker rm secmontest || true
   - docker login $PRIVATE_REGISTRY_URL -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
-  - docker run -i -t --name secmon-test --expose 80 --expose 443 -d $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
-  - docker cp . secmon-test:/var/www/secmon
-  - docker exec secmon-test bash -c 'apt update && apt install -y clamav && freshclam'
-  - docker exec secmon-test bash -c 'cd /var/www/secmon && python3 -c "import secmon_lib" && python3 -c "from secmon_web import *" 2>/dev/null' || true
-  - docker exec secmon-test clamscan --remove  --infected -r /var/www/secmon | tee scan-results.txt
-  - docker exec secmon-test clamscan --remove --infected -r /usr/local/lib/ | tee -a scan-results.txt 
-  - docker stop secmon-test && docker rm secmon-test 
-  allow_failure: true
+  - docker run -i -t --name secmontest -d $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
+  - docker cp . secmontest:/var/www/secmon
+  - docker exec secmontest bash -c 'apt update && apt install -y clamav && freshclam'
+  - docker exec secmontest bash -c 'cd /var/www/secmon ; python3 -c "import secmon_lib" ; python3 -c "from secmon_web import *" 2>/dev/null' || true
+  - docker exec secmontest clamscan --remove --infected -r /var/www /home /usr /etc /mnt /media /srv | tee scan-results.txt
+  - docker stop secmontest && docker rm secmontest 
+  allow_failure: false
 
 Test:
   stage: test
   script:
-  - docker stop secmon-test && docker rm secmon-test || true
+  - docker stop secmontest && docker rm secmontest || true
   - docker login $PRIVATE_REGISTRY_URL -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
-  - docker run -i -t --name secmon-test --expose 80 --expose 443 -d $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
-  - docker cp . secmon-test:/var/www/secmon
-  - docker exec secmon-test bash -c 'cd /var/www/secmon && python3 -c "import secmon_lib" && python3 -c "from secmon_web import *"'
-  - docker stop secmon-test && docker rm secmon-test 
-  allow_failure: true
+  - docker run -i -t --name secmontest -p 4443 -e SENDER=$SENDER -e GITHUB_USERNAME=$GITHUB_USERNAME -e GITHUB_API_KEY=$GITHUB_API_KEY -e WEB_USERNAME=$WEB_USERNAME -e WEB_PASSWD=$WEB_PASSWD -e FQDN=$FQDN -e SMTP_PASSWD=$SMTP_PASSWD -d $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG
+  - docker cp . secmontest:/var/www/secmon
+  - docker exec secmontest openssl req -newkey rsa:4096 -x509 -subj "/C=FR/ST=France/L=Paris/O=Test/CN=$FQDN" -sha512 -days 3650 -nodes -out /etc/ssl/secmon/secmon.crt -keyout /etc/ssl/secmon/secmon.key
+  - docker exec secmontest python3 /var/www/secmon/setup.py -login $SENDER -p $SMTP_PASSWD -server $SMTP_SRV -port '587' -tls yes -lang fr -sender $SENDER -r $SENDER -accept true -github_username $GITHUB_USERNAME -github_api_key $GITHUB_API_KEY -username $WEB_USERNAME -password $WEB_PASSWD
+  - docker exec secmontest nohup python3 /var/www/secmon/secmon.py >/dev/null 2>&1 &
+  - docker exec secmontest nohup python3 /var/www/secmon/cve_updater.py >/dev/null 2>&1 &
+  - docker exec secmontest cp /var/www/secmon/docker/secmon-ci.conf /etc/apache2/sites-enabled/secmon.conf
+  - docker exec secmontest chown -R www-data:www-data /var/www/secmon/ 
+  - docker exec secmontest chmod -R 744 /var/www/secmon/
+  - docker exec secmontest sed -i "s/{FQDN}/$FQDN/" /etc/apache2/sites-enabled/secmon.conf
+  - docker exec secmontest sed -i "s/Listen 443/Listen 4443/" /etc/apache2/ports.conf
+  - docker exec secmontest a2enmod ssl && docker exec secmontest service apache2 restart
+  - docker exec secmontest apt install -y wget
+  - docker exec secmontest wget  -q -S -O - https://127.0.0.1:4443 --no-check-certificate | grep "SECMON - Login"
+  - docker stop secmontest && docker rm secmontest || true
+  allow_failure: false
 
 Release-Image:
   stage: release_image
@@ -69,8 +87,8 @@ Release-Image:
   - docker login $PRIVATE_REGISTRY_URL -u $PRIVATE_REGISTRY_USERNAME -p $PRIVATE_REGISTRY_PASSWD
   - docker tag $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:$CI_COMMIT_REF_SLUG $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:latest
   - docker push $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:latest
-  - docker login -u $DOCKER_HUB_PASSWD -p $DOCKER_HUB_USERNAME
+  - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWD
   - docker tag $SECMON_REGISTRY_IMAGE_WITHOUT_TAG:latest guezone/secmon:latest
   - docker push guezone/secmon:latest
-  allow_failure: true
+  allow_failure: false
 
