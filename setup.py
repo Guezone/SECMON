@@ -16,6 +16,7 @@ from email.mime.text import MIMEText
 from secmon_lib import pollCveIdFromCpe, registerNewCve, getCpeList, getKeywordsList
 from datetime import datetime, timedelta
 from getpass import getpass
+from traceback_with_variables import print_exc
 rss_feeds = [ 
     'https://cyware.com/allnews/feed',
     'https://www.cshub.com/rss/categories/attacks',
@@ -35,10 +36,15 @@ rss_feeds = [
     'https://us-cert.cisa.gov/ncas/all.xml',
     'https://www.zataz.com/feed/'
 ]
-
-def mailTester(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, language):
+def handleException(error):
+	now = datetime.now()
+	now = now.strftime("%d/%m/%Y, %H:%M:%S")
+	print(f"################## NEW SETUP ERROR AT {now} ##################")
+	print(print_exc())
+	print("################## PLEASE REPORT THIS ON GITHUB ##################")
+def mailTester(smtp_login, smtp_passwd, server, port, tls, sender, receivers, language,github_username,github_api_key,username,password):
     print()
-    configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, language)
+    configBuilder(smtp_login, smtp_passwd, server, port, tls, sender, receivers, language,github_username,github_api_key,username,password)
     buildRSSList(rss_feeds)
     script_path = os.path.abspath(__file__)
     dir_path = script_path.replace("setup.py","")
@@ -68,7 +74,7 @@ def mailTester(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, l
     for receiver in receivers_email:
         try:
             print("\nPlease wait. A test message to {} will be sent to test your configuration.\n".format(receiver))
-            smtpserver = smtplib.SMTP(smtpsrv,port)
+            smtpserver = smtplib.SMTP(server,port)
             msg = MIMEMultipart()
             if language =="en" or language == "EN":
                 msg['Subject'] = 'SECMON - Test email.'
@@ -80,7 +86,8 @@ def mailTester(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, l
             msg['From'] = sender
             msg['To'] = receiver
             msg.attach(MIMEText(body, 'html'))
-        except:
+        except Exception as e:
+            handleException(e)
             print("Incorrect configuration. Exit")
             exit()
         try:
@@ -96,7 +103,7 @@ def mailTester(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receivers, l
                 print("You must specify if you want to use TLS(-tls yes|no). Exit.")
                 exit()      
         except Exception as e:
-            print(e)
+            handleException(e)
             print("An error occurred during authentication with the SMTP server. Check the configuration and try again.")
             exit()
     print("SECMON is now ready. Execute secmon.py now and automate it.")
@@ -122,7 +129,7 @@ def buildRSSList(rss_feeds):
             con.commit()
     print("Successful build database.\n")
 
-def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver, language):
+def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver, language,github_username,github_api_key,username,password):
     script_path = os.path.abspath(__file__)
     dir_path = script_path.replace("setup.py","")
     try:
@@ -139,9 +146,10 @@ def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver,
     con.execute('''CREATE TABLE cpe_list ([key] INTEGER PRIMARY KEY,[cpe] text)''')
     con.commit()
     con.execute("INSERT INTO config (smtp_login,smtp_password,smtpsrv,port,sender, receiver,tls,language) VALUES (?,?,?,?,?,?,?,?);", (smtp_login,enc_pass,smtpsrv,str(port),sender, receiver,tls,language))
-    con.commit()         
-    github_username = input("Please enter your Github username : ")
-    github_api_key = getpass("Please enter your Github API Token : ")
+    con.commit()  
+    if not github_username or not github_api_key or github_api_key=="" or github_username=="":       
+        github_username = input("Please enter your Github username : ")
+        github_api_key = getpass("Please enter your Github API Token : ")
     try:
         login_attempt = requests.get('https://api.github.com/search/repositories?q=github+api', auth=(github_username,github_api_key))
         if login_attempt.status_code != 200:
@@ -149,25 +157,23 @@ def configBuilder(smtp_login, smtp_passwd, smtpsrv, port, tls, sender, receiver,
         else:
             con.execute("INSERT INTO config (github_api_key,github_username,cvss_alert_limit,no_score_cve_alert) VALUES (?,?,?,?);", (github_username,github_api_key,"no_limit","True"))
             con.commit()
-    except:
+    except Exception as e:
+        handleException(e)
         print("Github API authentication failed. You can add this config on the web UI after installation...")
     else:
         con.execute("INSERT INTO config (github_api_key,github_username,cvss_alert_limit,no_score_cve_alert) VALUES (?,?,?,?);", ("None","None","no_limit","True"))
         con.commit()
-    print()
-    username = ""
-    password = ""
-    password2 = "!="
-    while username == "" or password == "" or password != password2:
-        username = input("Enter the username that can be used on the Web UI : ")
-        password = getpass("Enter the password (please choose a strong password !) : ")
-        password2 = getpass("Confirm the password : ")
-        if password != password2:
-            print("Both passwords must be the same.")
-        if username == "":
-            print("A username must be filled in.")
-        if password == "":
-            print("A password must be entered.")        
+    if not username or not password or username=="" or password=="":
+        while username == "" or password == "" or password != password2:
+            username = input("Enter the username that can be used on the Web UI : ")
+            password = getpass("Enter the password (please choose a strong password !) : ")
+            password2 = getpass("Confirm the password : ")
+            if password != password2:
+                print("Both passwords must be the same.")
+            if username == "":
+                print("A username must be filled in.")
+            if password == "":
+                print("A password must be entered.")        
     con.execute('''CREATE TABLE users ([uid] INTEGER PRIMARY KEY,[username] text,[pass_hash] text)''')
     con.execute('''CREATE TABLE secret_key ([uid] INTEGER PRIMARY KEY,[app_secret_key] text)''')
     con.commit()
@@ -188,6 +194,11 @@ def main():
     parser.add_argument("-tls",nargs=1,required=True,metavar="yes|no",help="use TLS for SMTP authentication")
     parser.add_argument("-r",nargs=1,required=True,metavar="email-addr1;email-addr2",help="set receivers email address")
     parser.add_argument("-lang",nargs=1,required=True,metavar="en|fr",help="set the language of the emails")
+    parser.add_argument("-accept",nargs=1,required=False,metavar="true|false",help="accept CC BY-NC-SA 4.0 SECMON license")
+    parser.add_argument("-github_username",nargs=1,required=False,metavar="github username",help="set github api username")
+    parser.add_argument("-github_api_key",nargs=1,required=False,metavar="github api key",help="set github api token")
+    parser.add_argument("-username",nargs=1,required=False,metavar="username",help="set web ui username")
+    parser.add_argument("-password",nargs=1,required=False,metavar="password",help="set web ui password")
     args = parser.parse_args()
     sender = ''.join(args.sender)
     smtp_login = ''.join(args.login)
@@ -197,13 +208,41 @@ def main():
     tls = ''.join(args.tls)
     receivers = ''.join(args.r)
     language = ''.join(args.lang)
+    try:
+        accept = ''.join(args.accept)
+    except:
+        accept = ""
+        pass
+    try:
+        github_username = ''.join(args.github_username)
+    except:
+        github_username = ""
+        pass
+    try:
+        github_api_key = ''.join(args.github_api_key)
+    except:
+        github_api_key = ""
+        pass
+    try:
+        username = ''.join(args.username)
+    except:
+        username = ""
+        pass
+    try:
+        password = ''.join(args.password)
+    except:
+        password = ""
+        pass
     print("------------------------------------")
     print(f"SECMON setup script - Version {__version__}")
     print("------------------------------------")
-    license_validation = input("SECMON is licensed by CC BY-NC-SA 4.0 license. Do you accept the terms of the license? (y/Y;n/N) : ")
-    if license_validation == "y" or license_validation == "Y":
-        mailTester(smtp_login, smtp_passwd, server, port, tls, sender, receivers, language)
+    if not accept or accept!="true":
+        license_validation = input("SECMON is licensed by CC BY-NC-SA 4.0 license. Do you accept the terms of the license? (y/Y;n/N) : ")
+        if license_validation == "y" or license_validation == "Y":
+            mailTester(smtp_login, smtp_passwd, server, port, tls, sender, receivers, language,github_username,github_api_key,username,password)
+        else:
+            print("\nYou must accept the terms of the license to install and use SECMON.")
+            exit()
     else:
-        print("\nYou must accept the terms of the license to install and use SECMON.")
-        exit()
+        mailTester(smtp_login, smtp_passwd, server, port, tls, sender, receivers, language,github_username,github_api_key,username,password)
 main()
